@@ -1,0 +1,445 @@
+---
+description: Pipeline for parsing TrueNAS audit records collected from `POST /api/v2.0/audit/query`.
+processors:
+  - set:
+      field: ecs.version
+      tag: set_ecs_version
+      value: '9.3.0'
+  - remove:
+      field:
+        - organization
+        - division
+        - team
+      ignore_missing: true
+      if: ctx.organization instanceof String && ctx.division instanceof String && ctx.team instanceof String
+      tag: remove_agentless_tags
+      description: >-
+        Removes the fields added by Agentless as metadata,
+        as they can collide with ECS fields.
+  - terminate:
+      tag: data_collection_error
+      if: ctx.error?.message != null && ctx.message == null && ctx.event?.original == null
+      description: error message set and no data to process.
+  - rename:
+      field: message
+      tag: rename_message_to_event_original
+      target_field: event.original
+      ignore_missing: true
+      description: Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.
+      if: ctx.event?.original == null
+  - remove:
+      field: message
+      tag: remove_message
+      ignore_missing: true
+      description: The `message` field is no longer required if the document has an `event.original` field.
+      if: ctx.event?.original != null
+
+  # Parsing
+  - json:
+      field: event.original
+      tag: parse_event_original
+      target_field: json
+      if: ctx.event?.original != null
+      description: Parses the audit record carried in `event.original`.
+  - script:
+      lang: painless
+      tag: prune_null_values
+      description: >-
+        Recursively drops null values and the containers that become empty as a result. TrueNAS returns
+        every optional key of an audit record explicitly as null, which would otherwise pollute the
+        flattened `truenas.audit.event_data` and `truenas.audit.service_data` objects.
+      if: ctx.json instanceof Map
+      source: |-
+        boolean prune(def o) {
+          if (o instanceof Map) {
+            def it = ((Map)o).entrySet().iterator();
+            while (it.hasNext()) {
+              if (prune(it.next().getValue())) {
+                it.remove();
+              }
+            }
+            return ((Map)o).isEmpty();
+          }
+          if (o instanceof List) {
+            def it = ((List)o).iterator();
+            while (it.hasNext()) {
+              if (prune(it.next())) {
+                it.remove();
+              }
+            }
+            return ((List)o).isEmpty();
+          }
+          return o == null;
+        }
+        prune(ctx.json);
+
+  # Timestamps
+  - date:
+      field: json.timestamp.$date
+      tag: date_event_timestamp
+      target_field: '@timestamp'
+      formats:
+        - UNIX_MS
+      if: ctx.json?.timestamp != null
+      description: >-
+        The API returns the event time as an Extended JSON `$date` wrapper holding epoch milliseconds.
+  - date:
+      field: json.message_timestamp
+      tag: date_message_timestamp
+      target_field: event.created
+      formats:
+        - UNIX
+      if: ctx.json?.message_timestamp != null
+      description: Epoch seconds at which the record was written to the TrueNAS audit database.
+  - set:
+      field: '@timestamp'
+      tag: set_timestamp_from_event_created
+      copy_from: event.created
+      if: ctx.json?.timestamp == null && ctx.event?.created != null
+      description: Falls back to the audit database write time when the record carries no event time.
+
+  # Common envelope
+  - rename:
+      field: json.audit_id
+      tag: rename_audit_id
+      target_field: event.id
+      ignore_missing: true
+  - fingerprint:
+      fields:
+        - event.id
+      tag: fingerprint_id_from_audit_id
+      target_field: _id
+      method: SHA-256
+      if: ctx.event?.id != null
+      description: >-
+        Derives the document `_id` from the audit record GUID so a record collected more than once
+        is the same document. The collector holds its cursor back one second because
+        `message_timestamp` has second granularity, which makes it re-query the boundary second on
+        every round; without a stable `_id` each of those rounds would index duplicates. Placed
+        after the `terminate` above so a collector error document, which carries no GUID, never
+        reaches it.
+  - rename:
+      field: json.service
+      tag: rename_service
+      target_field: event.provider
+      ignore_missing: true
+  - set:
+      field: event.kind
+      tag: set_event_kind
+      value: event
+  - set:
+      field: event.outcome
+      tag: set_event_outcome_success
+      value: success
+      if: ctx.json?.success == true
+  - set:
+      field: event.outcome
+      tag: set_event_outcome_failure
+      value: failure
+      if: ctx.json?.success == false
+  - set:
+      field: event.action
+      tag: set_event_action
+      value: '{{{event.provider}}}-{{{json.event}}}'
+      if: ctx.event?.provider != null && ctx.json?.event != null
+      description: Composes the vendor verb as `<service>-<event>`, for example `smb-create`.
+  - lowercase:
+      field: event.action
+      tag: lowercase_event_action
+      ignore_missing: true
+  - gsub:
+      field: event.action
+      tag: gsub_event_action
+      pattern: '_'
+      replacement: '-'
+      ignore_missing: true
+  - rename:
+      field: json.address
+      tag: rename_address
+      target_field: source.address
+      if: ctx.json?.address != null && ctx.json.address != ''
+      description: >-
+        The audited client address. Usually an IP, but SUDO records carry the submitting host name
+        instead, so it is stored in `source.address` and only promoted to `source.ip` when it parses.
+  - convert:
+      field: source.address
+      tag: convert_source_address_to_ip
+      target_field: source.ip
+      type: ip
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.username
+      tag: rename_username
+      target_field: user.name
+      if: ctx.json?.username != null && ctx.json.username != ''
+  - rename:
+      field: json.session
+      tag: rename_session
+      target_field: truenas.audit.session
+      if: ctx.json?.session != null && ctx.json.session != ''
+  - remove:
+      field:
+        - json.service_data.vers
+        - json.event_data.vers
+      tag: remove_schema_version
+      ignore_missing: true
+      description: The audit schema version carries no analytical value.
+
+  # ECS categorization
+  - script:
+      lang: painless
+      tag: set_ecs_categorization
+      description: Maps the TrueNAS service and event enum pair to ECS categorization fields.
+      if: ctx.event?.provider != null && ctx.json?.event != null
+      params:
+        "MIDDLEWARE:AUTHENTICATION":
+          category: [authentication]
+          type: [start]
+        "MIDDLEWARE:METHOD_CALL":
+          category: [api, configuration]
+          type: [change]
+        "MIDDLEWARE:REBOOT":
+          category: [host]
+          type: [end]
+        "MIDDLEWARE:SHUTDOWN":
+          category: [host]
+          type: [end]
+        "MIDDLEWARE:WEBSHELL_AUTHENTICATION":
+          category: [authentication, session]
+          type: [start]
+        "MIDDLEWARE:WEBSHELL_LOGOUT":
+          category: [authentication, session]
+          type: [end]
+        "SMB:AUTHENTICATION":
+          category: [authentication]
+          type: [start]
+        "SMB:CONNECT":
+          category: [session]
+          type: [start]
+        "SMB:DISCONNECT":
+          category: [session]
+          type: [end]
+        "SMB:CREATE":
+          category: [file]
+          type: [creation]
+        "SMB:CLOSE":
+          category: [file]
+          type: [access]
+        "SMB:READ":
+          category: [file]
+          type: [access]
+        "SMB:OFFLOAD_READ":
+          category: [file]
+          type: [access]
+        "SMB:WRITE":
+          category: [file]
+          type: [change]
+        "SMB:OFFLOAD_WRITE":
+          category: [file]
+          type: [change]
+        "SMB:SET_ATTR":
+          category: [file]
+          type: [change]
+        "SMB:SET_ACL":
+          category: [file]
+          type: [change]
+        "SMB:SET_QUOTA":
+          category: [file]
+          type: [change]
+        "SMB:FSCTL":
+          category: [file]
+          type: [change]
+        "SMB:RENAME":
+          category: [file]
+          type: [change]
+        "SMB:UNLINK":
+          category: [file]
+          type: [deletion]
+        "SUDO:ACCEPT":
+          category: [process]
+          type: [start]
+        "SUDO:REJECT":
+          category: [process]
+          type: [start]
+        "SYSTEM:LOGIN":
+          category: [authentication]
+          type: [start]
+        "SYSTEM:PRIVILEGED":
+          category: [process]
+          type: [start]
+        "SYSTEM:ESCALATION":
+          category: [process]
+          type: [start]
+      source: |-
+        def mapping = params[ctx.event.provider + ':' + ctx.json.event];
+        if (mapping == null) {
+          return;
+        }
+        ctx.event.category = mapping.category;
+        ctx.event.type = mapping.type;
+
+  # Per-service parsing
+  - pipeline:
+      name: '{{ IngestPipeline "pipeline-middleware" }}'
+      tag: route_middleware
+      if: ctx.event?.provider == 'MIDDLEWARE'
+  - pipeline:
+      name: '{{ IngestPipeline "pipeline-smb" }}'
+      tag: route_smb
+      if: ctx.event?.provider == 'SMB'
+  - pipeline:
+      name: '{{ IngestPipeline "pipeline-sudo" }}'
+      tag: route_sudo
+      if: ctx.event?.provider == 'SUDO'
+  - pipeline:
+      name: '{{ IngestPipeline "pipeline-system" }}'
+      tag: route_system
+      if: ctx.event?.provider == 'SYSTEM'
+
+  # IP geolocation lookup
+  - geoip:
+      field: source.ip
+      tag: enrich_source_geo
+      target_field: source.geo
+      ignore_missing: true
+      if: ctx.source?.ip != null && ctx.source?.geo == null
+
+  # IP autonomous system lookup
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+      tag: enrich_source_asn
+      target_field: source.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+      if: ctx.source?.ip != null && ctx.source?.as == null
+  - rename:
+      field: source.as.asn
+      tag: rename_source_as_number
+      target_field: source.as.number
+      ignore_missing: true
+  - rename:
+      field: source.as.organization_name
+      tag: rename_source_as_organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+
+  # Related fields
+  - append:
+      field: related.ip
+      tag: append_source_ip_to_related_ip
+      value: '{{{source.ip}}}'
+      allow_duplicates: false
+      if: ctx.source?.ip != null
+  - append:
+      field: related.ip
+      tag: append_destination_ip_to_related_ip
+      value: '{{{destination.ip}}}'
+      allow_duplicates: false
+      if: ctx.destination?.ip != null
+  - append:
+      field: related.user
+      tag: append_user_name_to_related_user
+      value: '{{{user.name}}}'
+      allow_duplicates: false
+      if: ctx.user?.name != null
+  - append:
+      field: related.user
+      tag: append_user_effective_name_to_related_user
+      value: '{{{user.effective.name}}}'
+      allow_duplicates: false
+      if: ctx.user?.effective?.name != null
+  - append:
+      field: related.user
+      tag: append_user_target_name_to_related_user
+      value: '{{{user.target.name}}}'
+      allow_duplicates: false
+      if: ctx.user?.target?.name != null
+  - append:
+      field: related.hosts
+      tag: append_source_address_to_related_hosts
+      value: '{{{source.address}}}'
+      allow_duplicates: false
+      if: ctx.source?.address != null && ctx.source?.ip == null
+      description: SUDO records carry the submitting host name in `address` rather than an IP.
+  - append:
+      field: related.hosts
+      tag: append_workstation_to_related_hosts
+      value: '{{{truenas.audit.workstation}}}'
+      allow_duplicates: false
+      if: ctx.truenas?.audit?.workstation != null
+
+  # Cleanup
+  - script:
+      lang: painless
+      tag: prune_empty_containers
+      description: >-
+        Second pass of the same recursive prune, run after the per-service sub-pipelines. Those
+        pipelines promote individual keys out of `event_data` and `service_data` and routinely drain
+        a nested container, or the whole object, without emptying it of null. Draining them here is
+        what keeps the two renames below from promoting an object that has nothing left in it to
+        `truenas.audit.event_data` or `truenas.audit.service_data`.
+      if: ctx.json instanceof Map
+      source: |-
+        boolean prune(def o) {
+          if (o instanceof Map) {
+            def it = ((Map)o).entrySet().iterator();
+            while (it.hasNext()) {
+              if (prune(it.next().getValue())) {
+                it.remove();
+              }
+            }
+            return ((Map)o).isEmpty();
+          }
+          if (o instanceof List) {
+            def it = ((List)o).iterator();
+            while (it.hasNext()) {
+              if (prune(it.next())) {
+                it.remove();
+              }
+            }
+            return ((List)o).isEmpty();
+          }
+          return o == null;
+        }
+        prune(ctx.json);
+  - rename:
+      field: json.service_data
+      tag: rename_service_data
+      target_field: truenas.audit.service_data
+      if: ctx.json?.service_data instanceof Map && ctx.json.service_data.size() != 0
+      description: Any service context that was not promoted to a dedicated field is kept as a flattened object.
+  - rename:
+      field: json.event_data
+      tag: rename_event_data
+      target_field: truenas.audit.event_data
+      if: ctx.json?.event_data instanceof Map && ctx.json.event_data.size() != 0
+      description: Any event payload that was not promoted to a dedicated field is kept as a flattened object.
+  - remove:
+      field: json
+      tag: remove_json
+      ignore_missing: true
+  - append:
+      field: tags
+      tag: append_preserve_original_event_on_error
+      value: preserve_original_event
+      allow_duplicates: false
+      if: ctx.error?.message != null
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        Processor '{{{ _ingest.on_failure_processor_type }}}'
+        {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}'
+        {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'
+  - set:
+      field: event.kind
+      tag: set_pipeline_error_to_event_kind
+      value: pipeline_error
+  - append:
+      field: tags
+      value: preserve_original_event
+      allow_duplicates: false

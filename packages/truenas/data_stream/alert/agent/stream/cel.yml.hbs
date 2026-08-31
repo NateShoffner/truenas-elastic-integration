@@ -1,0 +1,145 @@
+interval: {{interval}}
+resource.tracer:
+  enabled: {{enable_request_tracer}}
+  filename: "../../logs/cel/http-request-trace-*.ndjson"
+  maxbackups: 5
+{{#if proxy_url}}
+resource.proxy_url: {{proxy_url}}
+{{/if}}
+{{#if ssl}}
+resource.ssl: {{ssl}}
+{{/if}}
+{{#if http_client_timeout}}
+resource.timeout: {{http_client_timeout}}
+{{/if}}
+resource.url: {{url}}
+state:
+  api_key: {{api_key}}
+redact:
+  fields:
+    - api_key
+program: |-
+  // TrueNAS SCALE system alerts: GET /api/v2.0/alert/list.
+  //
+  // The endpoint is a live snapshot rather than a log. It returns every alert
+  // currently active on the system on every call, and takes no query
+  // parameters, no pagination and no time filter, so one request collects the
+  // whole result set and want_more is never set.
+  //
+  // State:
+  // cursor.last_occurrence  persistent  last_occurrence high-water mark (epoch ms)
+  //
+  // Only alerts newer than the mark are emitted. An alert that merely stays
+  // active is therefore not re-emitted on every poll, while an alert that
+  // recurs is re-emitted because TrueNAS advances its last_occurrence. The mark
+  // is the maximum over the whole snapshot floored at its previous value, so it
+  // never regresses when alerts are cleared, and it advances only when at least
+  // one alert is emitted, which is what keeps the cursor update durable.
+  //
+  // Inherent limits of a snapshot source: clearing an alert and dismissing one
+  // produce no event, and an alert that surfaces with a last_occurrence older
+  // than the mark is not collected.
+  int(state.?cursor.last_occurrence.orValue(0)).as(since,
+    state.with(
+      request(
+        "GET",
+        state.url.trim_right("/") + "/api/v2.0/alert/list"
+      ).with(
+        {
+          "Header": {
+            "Authorization": ["Bearer " + state.api_key],
+            "Accept": ["application/json"],
+          },
+        }
+      ).do_request().as(resp,
+        (resp.StatusCode == 200) ?
+          try(resp.Body.decode_json()).as(body,
+            // alert.list returns a flat JSON array. Anything else is a protocol
+            // error: an unrouted /api path falls through to the web UI and
+            // answers with HTTP 200 and an HTML body.
+            (is_error(body) || type(body) != type([])) ?
+              {
+                "events": {
+                  "error": {
+                    "code": string(resp.StatusCode),
+                    "id": "unexpected_body",
+                    "message": "GET /api/v2.0/alert/list: unexpected response body: " + string(resp.Body),
+                  },
+                },
+                "want_more": false,
+              }
+            :
+              // last_occurrence is treated as optional, matching the ingest
+              // pipeline, which guards on it and falls back to event.start.
+              // Dereferencing it unguarded would abort the whole evaluation as
+              // soon as one alert lacked it, yielding no events at all on every
+              // poll for as long as that alert stayed active. Alerts without a
+              // usable value collapse to the sentinel 0, which is below every
+              // real mark and below `since`, so they are skipped rather than
+              // emitted and can never move the mark.
+              body.map(e,
+                {
+                  "alert": e,
+                  "occurred": (e.?last_occurrence["$date"].orValue(null) != null) ?
+                    int(e.last_occurrence["$date"])
+                  :
+                    0,
+                }
+              ).as(alerts,
+                {
+                  "events": alerts.filter(a, a.occurred > since).map(a, {"message": a.alert.encode_json()}),
+                  // Prepending the previous mark keeps the maximum defined for an
+                  // empty snapshot and stops the mark regressing when the newest
+                  // alerts are cleared.
+                  "cursor": {
+                    "last_occurrence": ([since] + alerts.map(a, a.occurred)).max(),
+                  },
+                  "want_more": false,
+                }
+              )
+          )
+        :
+          // A 401 carries a text/plain body, not JSON, so the body is passed
+          // through verbatim rather than decoded.
+          {
+            "code": string(resp.StatusCode),
+            "id": string(resp.Status),
+            "message": "GET /api/v2.0/alert/list: " + ((size(resp.Body) != 0) ? string(resp.Body) : string(resp.Status)),
+          }.as(err,
+            // A 4xx other than 429 is a persistent client error, most often an
+            // expired, revoked or HTTPS-revoked API key, and retrying it
+            // changes nothing. The array error shape keeps the persisted mark
+            // and hands the error document to the pipeline's terminate
+            // processor. The single-object shape would delete the cursor, so
+            // once the credential is repaired the mark would reset to 0 and the
+            // whole active snapshot would be re-emitted once. 429 and 5xx are
+            // transient, so they keep the object shape and let the cursor be
+            // dropped and the poll retried.
+            (resp.StatusCode >= 400 && resp.StatusCode < 500 && resp.StatusCode != 429) ?
+              {
+                "events": dyn([{"error": err}]),
+                // Restated explicitly rather than left to state propagation:
+                // surviving the error is the entire point of this branch.
+                "cursor": {"last_occurrence": since},
+                "want_more": false,
+              }
+            :
+              {
+                "events": dyn({"error": err}),
+                "want_more": false,
+              }
+          )
+      )
+    )
+  )
+tags:
+{{#each tags as |tag|}}
+  - {{tag}}
+{{/each}}
+{{#contains "forwarded" tags}}
+publisher_pipeline.disable_host: true
+{{/contains}}
+{{#if processors}}
+processors:
+{{processors}}
+{{/if}}

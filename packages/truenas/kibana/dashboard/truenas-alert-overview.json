@@ -1,0 +1,941 @@
+{
+    "attributes": {
+        "description": "Overview of the TrueNAS system health alerts collected by the TrueNAS integration. TrueNAS only reports an alert when it is raised or when it recurs, so this dashboard shows the alerts raised in the selected time range, not the set of alerts that is currently active: no document is produced when an alert clears or is dismissed. Every panel is scoped to the truenas.alert dataset.",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": "data_stream.dataset: \"truenas.alert\""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "syncCursor": true,
+            "syncTooltips": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-5513632f-8ae7-518b-a7d0-b8654c2e9c74",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "5513632f-8ae7-518b-a7d0-b8654c2e9c74": {
+                                            "columnOrder": [
+                                                "15efb925-3945-56fb-8721-1d54694c8c0f"
+                                            ],
+                                            "columns": {
+                                                "15efb925-3945-56fb-8721-1d54694c8c0f": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.alert\""
+                            },
+                            "visualization": {
+                                "layerId": "5513632f-8ae7-518b-a7d0-b8654c2e9c74",
+                                "layerType": "data",
+                                "metricAccessor": "15efb925-3945-56fb-8721-1d54694c8c0f"
+                            }
+                        },
+                        "title": "Alerts raised",
+                        "type": "lens",
+                        "visualizationType": "lnsMetric"
+                    },
+                    "description": "Number of times an alert was raised or recurred in the selected time range. This is not a count of currently active alerts.",
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "742d8e36-e9f9-5d68-aff6-1c3ff917f298",
+                    "w": 16,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "742d8e36-e9f9-5d68-aff6-1c3ff917f298",
+                "title": "Alerts raised",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-b7652af9-b4fd-568c-a1e0-5e28667859e5",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "b7652af9-b4fd-568c-a1e0-5e28667859e5": {
+                                            "columnOrder": [
+                                                "1dda49b5-8674-539f-b2d2-2fc871428a94"
+                                            ],
+                                            "columns": {
+                                                "1dda49b5-8674-539f-b2d2-2fc871428a94": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.alert\" and event.severity >= 3"
+                            },
+                            "visualization": {
+                                "layerId": "b7652af9-b4fd-568c-a1e0-5e28667859e5",
+                                "layerType": "data",
+                                "metricAccessor": "1dda49b5-8674-539f-b2d2-2fc871428a94"
+                            }
+                        },
+                        "title": "Warning or higher",
+                        "type": "lens",
+                        "visualizationType": "lnsMetric"
+                    },
+                    "description": "event.severity runs from 1 (info) to 7 (emergency); higher is more severe. This panel counts severity 3 (warning) and above.",
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "515f9d5b-7c85-51fc-aa96-1a9cb9bac87c",
+                    "w": 16,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "515f9d5b-7c85-51fc-aa96-1a9cb9bac87c",
+                "title": "Warning or higher",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-f23492f1-4881-5aca-b149-020a591c4dd0",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "f23492f1-4881-5aca-b149-020a591c4dd0": {
+                                            "columnOrder": [
+                                                "d4bd2908-c316-5a1d-922a-56981636c28c"
+                                            ],
+                                            "columns": {
+                                                "d4bd2908-c316-5a1d-922a-56981636c28c": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "",
+                                                    "operationType": "unique_count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "event.action"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.alert\""
+                            },
+                            "visualization": {
+                                "layerId": "f23492f1-4881-5aca-b149-020a591c4dd0",
+                                "layerType": "data",
+                                "metricAccessor": "d4bd2908-c316-5a1d-922a-56981636c28c"
+                            }
+                        },
+                        "title": "Alert classes",
+                        "type": "lens",
+                        "visualizationType": "lnsMetric"
+                    },
+                    "description": "Distinct TrueNAS alert classes seen, for example ScrubFinished or VolumeStatus.",
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "ae9c7740-6192-52db-a666-c0ba110942b7",
+                    "w": 16,
+                    "x": 32,
+                    "y": 0
+                },
+                "panelIndex": "ae9c7740-6192-52db-a666-c0ba110942b7",
+                "title": "Alert classes",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-127c833f-9ecd-566c-85cb-48b95c26595b",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "127c833f-9ecd-566c-85cb-48b95c26595b": {
+                                            "columnOrder": [
+                                                "4c2940c1-6152-560c-b8f7-c245bb6b294f",
+                                                "1558c396-fe5d-5b89-9fea-2628f9a4f92d",
+                                                "8b425db2-1379-50dd-a2a3-a5d42cbffef4"
+                                            ],
+                                            "columns": {
+                                                "1558c396-fe5d-5b89-9fea-2628f9a4f92d": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Level",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 7
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "log.level"
+                                                },
+                                                "4c2940c1-6152-560c-b8f7-c245bb6b294f": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "8b425db2-1379-50dd-a2a3-a5d42cbffef4": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Alerts raised",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.alert\""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": false,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "8b425db2-1379-50dd-a2a3-a5d42cbffef4"
+                                        ],
+                                        "layerId": "127c833f-9ecd-566c-85cb-48b95c26595b",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar_stacked",
+                                        "showGridlines": false,
+                                        "splitAccessor": "1558c396-fe5d-5b89-9fea-2628f9a4f92d",
+                                        "xAccessor": "4c2940c1-6152-560c-b8f7-c245bb6b294f"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide"
+                            }
+                        },
+                        "title": "Alerts raised over time by level",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "74e08024-153d-51fe-a182-d8ff8e4ffad4",
+                    "w": 48,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "74e08024-153d-51fe-a182-d8ff8e4ffad4",
+                "title": "Alerts raised over time by level",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-d91d9615-9f03-5eb0-affa-e19a09f2b5f4",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "d91d9615-9f03-5eb0-affa-e19a09f2b5f4": {
+                                            "columnOrder": [
+                                                "3109d7ee-9a63-5812-b92e-5f0ab5b38168",
+                                                "6351c9dd-be1d-51d4-9d9a-eb76769cdbee",
+                                                "15b91812-7c96-5c19-8c55-9d864a0738be"
+                                            ],
+                                            "columns": {
+                                                "15b91812-7c96-5c19-8c55-9d864a0738be": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Severity",
+                                                    "operationType": "max",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "event.severity"
+                                                },
+                                                "3109d7ee-9a63-5812-b92e-5f0ab5b38168": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Level",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "15b91812-7c96-5c19-8c55-9d864a0738be",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 7
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "log.level"
+                                                },
+                                                "6351c9dd-be1d-51d4-9d9a-eb76769cdbee": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Alerts raised",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.alert\""
+                            },
+                            "visualization": {
+                                "columns": [
+                                    {
+                                        "columnId": "3109d7ee-9a63-5812-b92e-5f0ab5b38168",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "6351c9dd-be1d-51d4-9d9a-eb76769cdbee",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "15b91812-7c96-5c19-8c55-9d864a0738be",
+                                        "isTransposed": false
+                                    }
+                                ],
+                                "layerId": "d91d9615-9f03-5eb0-affa-e19a09f2b5f4",
+                                "layerType": "data"
+                            }
+                        },
+                        "title": "Alerts by level",
+                        "type": "lens",
+                        "visualizationType": "lnsDatatable"
+                    },
+                    "description": "Ordered by event.severity, where 7 (emergency) is the most severe and 1 (info) the least.",
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "76af9314-4f83-56d5-8290-4aec01e94973",
+                    "w": 16,
+                    "x": 0,
+                    "y": 21
+                },
+                "panelIndex": "76af9314-4f83-56d5-8290-4aec01e94973",
+                "title": "Alerts by level",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-8860820e-f11b-5ab8-a8b8-eedfeb397c33",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "8860820e-f11b-5ab8-a8b8-eedfeb397c33": {
+                                            "columnOrder": [
+                                                "03949909-c5e2-5103-bdc1-9c1b301c6d63",
+                                                "57495d1c-447d-57c7-a6b3-c9f79a159830",
+                                                "eacc1765-73d6-57cc-97bb-f241d14f3da9"
+                                            ],
+                                            "columns": {
+                                                "03949909-c5e2-5103-bdc1-9c1b301c6d63": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Alert class",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "57495d1c-447d-57c7-a6b3-c9f79a159830",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.action"
+                                                },
+                                                "57495d1c-447d-57c7-a6b3-c9f79a159830": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Alerts raised",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                },
+                                                "eacc1765-73d6-57cc-97bb-f241d14f3da9": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Highest severity",
+                                                    "operationType": "max",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "event.severity"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.alert\""
+                            },
+                            "visualization": {
+                                "columns": [
+                                    {
+                                        "columnId": "03949909-c5e2-5103-bdc1-9c1b301c6d63",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "57495d1c-447d-57c7-a6b3-c9f79a159830",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "eacc1765-73d6-57cc-97bb-f241d14f3da9",
+                                        "isTransposed": false
+                                    }
+                                ],
+                                "layerId": "8860820e-f11b-5ab8-a8b8-eedfeb397c33",
+                                "layerType": "data"
+                            }
+                        },
+                        "title": "Top alert classes",
+                        "type": "lens",
+                        "visualizationType": "lnsDatatable"
+                    },
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "1c113d05-4e35-5fb4-a42f-fc52ee8cfe6b",
+                    "w": 20,
+                    "x": 16,
+                    "y": 21
+                },
+                "panelIndex": "1c113d05-4e35-5fb4-a42f-fc52ee8cfe6b",
+                "title": "Top alert classes",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-fa44e5e4-ccb0-5ee8-abdf-ada2ed26b5f0",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "fa44e5e4-ccb0-5ee8-abdf-ada2ed26b5f0": {
+                                            "columnOrder": [
+                                                "a6dd4349-673e-51db-94fe-1f7db60b4758",
+                                                "bf855f5a-5a0b-5b83-8b3c-e74ea6380cf8"
+                                            ],
+                                            "columns": {
+                                                "a6dd4349-673e-51db-94fe-1f7db60b4758": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Node",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "bf855f5a-5a0b-5b83-8b3c-e74ea6380cf8",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "truenas.alert.node"
+                                                },
+                                                "bf855f5a-5a0b-5b83-8b3c-e74ea6380cf8": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Alerts raised",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.alert\""
+                            },
+                            "visualization": {
+                                "columns": [
+                                    {
+                                        "columnId": "a6dd4349-673e-51db-94fe-1f7db60b4758",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "bf855f5a-5a0b-5b83-8b3c-e74ea6380cf8",
+                                        "isTransposed": false
+                                    }
+                                ],
+                                "layerId": "fa44e5e4-ccb0-5ee8-abdf-ada2ed26b5f0",
+                                "layerType": "data"
+                            }
+                        },
+                        "title": "Alerts by node",
+                        "type": "lens",
+                        "visualizationType": "lnsDatatable"
+                    },
+                    "description": "The TrueNAS host name on a single-controller system, or the failover label Controller A / Controller B on an HA pair.",
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "05d37443-db22-532a-ab1c-11c6461e1b75",
+                    "w": 12,
+                    "x": 36,
+                    "y": 21
+                },
+                "panelIndex": "05d37443-db22-532a-ab1c-11c6461e1b75",
+                "title": "Alerts by node",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-d4b21559-a6ae-5a14-915c-66c86465ea37",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "d4b21559-a6ae-5a14-915c-66c86465ea37": {
+                                            "columnOrder": [
+                                                "a5445890-8cb3-55a1-af69-858ebd02ca48",
+                                                "50a6d87e-ca6c-5f54-a2de-fd66ee86f595",
+                                                "619b40ba-a188-5d01-b868-d1027114de09",
+                                                "79f621e3-71f0-5785-9700-26f5ace2536e"
+                                            ],
+                                            "columns": {
+                                                "50a6d87e-ca6c-5f54-a2de-fd66ee86f595": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Level",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "619b40ba-a188-5d01-b868-d1027114de09",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 7
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "log.level"
+                                                },
+                                                "619b40ba-a188-5d01-b868-d1027114de09": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Alerts raised",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                },
+                                                "79f621e3-71f0-5785-9700-26f5ace2536e": {
+                                                    "customLabel": true,
+                                                    "dataType": "date",
+                                                    "isBucketed": false,
+                                                    "label": "Last raised",
+                                                    "operationType": "max",
+                                                    "params": {},
+                                                    "scale": "ratio",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "a5445890-8cb3-55a1-af69-858ebd02ca48": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Message",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "619b40ba-a188-5d01-b868-d1027114de09",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "truenas.alert.text"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.alert\""
+                            },
+                            "visualization": {
+                                "columns": [
+                                    {
+                                        "columnId": "a5445890-8cb3-55a1-af69-858ebd02ca48",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "50a6d87e-ca6c-5f54-a2de-fd66ee86f595",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "619b40ba-a188-5d01-b868-d1027114de09",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "79f621e3-71f0-5785-9700-26f5ace2536e",
+                                        "isTransposed": false
+                                    }
+                                ],
+                                "layerId": "d4b21559-a6ae-5a14-915c-66c86465ea37",
+                                "layerType": "data"
+                            }
+                        },
+                        "title": "Alert messages",
+                        "type": "lens",
+                        "visualizationType": "lnsDatatable"
+                    },
+                    "description": "Grouped by truenas.alert.text, the unrendered alert template, which is identical for every occurrence of an alert class. The text rendered for a single occurrence is in message; open the Alerts raised Discover session to read it. Last raised is the most recent occurrence in the selected time range.",
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "77b81b69-03fa-5383-8eb9-17a187c9160a",
+                    "w": 48,
+                    "x": 0,
+                    "y": 34
+                },
+                "panelIndex": "77b81b69-03fa-5383-8eb9-17a187c9160a",
+                "title": "Alert messages",
+                "type": "lens"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Logs TrueNAS] Alert overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.8.0",
+    "id": "truenas-alert-overview",
+    "references": [
+        {
+            "id": "logs-*",
+            "name": "742d8e36-e9f9-5d68-aff6-1c3ff917f298:indexpattern-datasource-layer-5513632f-8ae7-518b-a7d0-b8654c2e9c74",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "515f9d5b-7c85-51fc-aa96-1a9cb9bac87c:indexpattern-datasource-layer-b7652af9-b4fd-568c-a1e0-5e28667859e5",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "ae9c7740-6192-52db-a666-c0ba110942b7:indexpattern-datasource-layer-f23492f1-4881-5aca-b149-020a591c4dd0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "74e08024-153d-51fe-a182-d8ff8e4ffad4:indexpattern-datasource-layer-127c833f-9ecd-566c-85cb-48b95c26595b",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "76af9314-4f83-56d5-8290-4aec01e94973:indexpattern-datasource-layer-d91d9615-9f03-5eb0-affa-e19a09f2b5f4",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "1c113d05-4e35-5fb4-a42f-fc52ee8cfe6b:indexpattern-datasource-layer-8860820e-f11b-5ab8-a8b8-eedfeb397c33",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "05d37443-db22-532a-ab1c-11c6461e1b75:indexpattern-datasource-layer-fa44e5e4-ccb0-5ee8-abdf-ada2ed26b5f0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "77b81b69-03fa-5383-8eb9-17a187c9160a:indexpattern-datasource-layer-d4b21559-a6ae-5a14-915c-66c86465ea37",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "dashboard",
+    "typeMigrationVersion": "10.3.0"
+}

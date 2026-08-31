@@ -1,0 +1,66 @@
+{
+    "@timestamp": "2026-07-19T02:36:12.000Z",
+    "agent": {
+        "ephemeral_id": "3a76c41c-668f-4523-a9b7-c9b7cab7a96b",
+        "id": "d2bb0255-b663-4325-9d16-87028f326136",
+        "name": "elastic-agent-48057",
+        "type": "filebeat",
+        "version": "9.4.3"
+    },
+    "data_stream": {
+        "dataset": "truenas.alert",
+        "namespace": "52247",
+        "type": "logs"
+    },
+    "ecs": {
+        "version": "9.3.0"
+    },
+    "elastic_agent": {
+        "id": "d2bb0255-b663-4325-9d16-87028f326136",
+        "snapshot": false,
+        "version": "9.4.3"
+    },
+    "event": {
+        "action": "PoolUpgraded",
+        "agent_id_status": "verified",
+        "category": [
+            "host"
+        ],
+        "dataset": "truenas.alert",
+        "id": "fc27041b-43a2-50fa-9f53-2bdcfbab64b7",
+        "ingested": "2026-08-04T05:02:49Z",
+        "kind": "alert",
+        "module": "truenas",
+        "severity": 2,
+        "start": "2026-07-19T02:36:12.000Z",
+        "type": [
+            "info"
+        ]
+    },
+    "input": {
+        "type": "cel"
+    },
+    "log": {
+        "level": "notice"
+    },
+    "message": "New ZFS version or feature flags are available for pool 'nas01'. Upgrading pools is a one-time process that can prevent rolling the system back to an earlier TrueNAS version. It is recommended to read the TrueNAS release notes and confirm you need the new ZFS feature flags before upgrading a pool.",
+    "related": {
+        "hosts": [
+            "nas01"
+        ]
+    },
+    "tags": [
+        "forwarded",
+        "truenas-alert"
+    ],
+    "truenas": {
+        "alert": {
+            "args": "nas01",
+            "dismissed": true,
+            "key": "\"nas01\"",
+            "node": "nas01",
+            "one_shot": false,
+            "text": "New ZFS version or feature flags are available for pool '%s'. Upgrading pools is a one-time process that can prevent rolling the system back to an earlier TrueNAS version. It is recommended to read the TrueNAS release notes and confirm you need the new ZFS feature flags before upgrading a pool."
+        }
+    }
+}

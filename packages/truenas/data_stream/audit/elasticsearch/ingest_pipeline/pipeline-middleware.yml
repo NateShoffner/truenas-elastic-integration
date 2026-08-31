@@ -1,0 +1,140 @@
+---
+description: Pipeline for parsing TrueNAS MIDDLEWARE audit records.
+processors:
+  - rename:
+      field: json.service_data.protocol
+      tag: rename_protocol
+      target_field: truenas.audit.protocol
+      ignore_missing: true
+      description: Transport the middleware call arrived on, `REST` or `WEBSOCKET`.
+  - rename:
+      field: json.event_data.method
+      tag: rename_method
+      target_field: truenas.audit.method
+      ignore_missing: true
+  - script:
+      lang: painless
+      tag: encode_params_as_json
+      if: ctx.json?.event_data?.params != null
+      description: >-
+        Serialises the method arguments to a JSON string whenever they are not already a string.
+        `event_data.params` holds the arguments of an arbitrary middleware API method, so its JSON
+        shape differs per method: an array of objects for `user.create`, an array of bare strings
+        for `pool.scrub.scrub`, and mixed, nested or empty arrays elsewhere. No object mapping
+        accepts every one of those shapes, so the arguments are stored as a single string that keeps
+        the full call detail readable. Values that already are strings are left alone so the common
+        case stays readable rather than becoming a quoted JSON scalar, which matches how the `alert`
+        data stream encodes its own polymorphic fields. There is no built-in processor that
+        serialises a value to JSON.
+      source: |-
+        if (!(ctx.json.event_data.params instanceof String)) {
+          ctx.json.event_data.params = Json.dump(ctx.json.event_data.params);
+        }
+  - rename:
+      field: json.event_data.params
+      tag: rename_params
+      target_field: truenas.audit.params
+      ignore_missing: true
+      description: The JSON-encoded method arguments produced by the preceding processor.
+  - rename:
+      field: json.event_data.description
+      tag: rename_description_to_message
+      target_field: message
+      ignore_missing: true
+  - rename:
+      field: json.event_data.authenticated
+      tag: rename_authenticated
+      target_field: truenas.audit.authenticated
+      ignore_missing: true
+  - rename:
+      field: json.event_data.authorized
+      tag: rename_authorized
+      target_field: truenas.audit.authorized
+      ignore_missing: true
+  - rename:
+      field: json.event_data.credentials.credentials
+      tag: rename_event_credentials_type
+      target_field: truenas.audit.credentials.type
+      ignore_missing: true
+  - rename:
+      field: json.event_data.credentials.credentials_data
+      tag: rename_event_credentials_data
+      target_field: truenas.audit.credentials.data
+      ignore_missing: true
+      if: ctx.json?.event_data?.credentials?.credentials_data instanceof Map
+      description: >-
+        The API models the credential payload as an object for every credential type. The guard
+        keeps a non-object payload out of the flattened field, which only accepts objects at its
+        root, so an unexpected shape cannot get the whole document rejected at index time.
+  - remove:
+      field: json.event_data.credentials
+      tag: remove_event_credentials
+      ignore_missing: true
+  - rename:
+      field: json.service_data.credentials.credentials
+      tag: rename_service_credentials_type
+      target_field: truenas.audit.credentials.type
+      ignore_missing: true
+      if: ctx.truenas?.audit?.credentials?.type == null
+      description: METHOD_CALL records carry the session credential type in `service_data` only.
+  - rename:
+      field: json.service_data.credentials.credentials_data
+      tag: rename_service_credentials_data
+      target_field: truenas.audit.credentials.data
+      ignore_missing: true
+      if: >-
+        ctx.truenas?.audit?.credentials?.data == null &&
+        ctx.json?.service_data?.credentials?.credentials_data instanceof Map
+      description: >-
+        Same object guard as the `event_data` credential payload above.
+  - remove:
+      field: json.service_data.credentials
+      tag: remove_service_credentials
+      ignore_missing: true
+  - rename:
+      field: json.event_data.error
+      tag: rename_error_to_error_message
+      target_field: error.message
+      ignore_missing: true
+  - rename:
+      field: json.event_data.reason
+      tag: rename_reason
+      target_field: truenas.audit.reason
+      ignore_missing: true
+      description: Reason recorded with REBOOT and SHUTDOWN records.
+  - rename:
+      field: json.event_data.shell_type
+      tag: rename_shell_type
+      target_field: truenas.audit.shell_type
+      ignore_missing: true
+  - rename:
+      field: json.event_data.username
+      tag: rename_webshell_username
+      target_field: user.target.name
+      ignore_missing: true
+      description: Account the web shell session runs as.
+  - set:
+      field: event.type
+      tag: set_event_type_access_for_read_method
+      value:
+        - access
+      if: >-
+        ctx.truenas?.audit?.method != null && (ctx.truenas.audit.method.endsWith('.query') ||
+        ctx.truenas.audit.method.endsWith('.config') || ctx.truenas.audit.method.endsWith('.get_instance') ||
+        ctx.truenas.audit.method.contains('.get_'))
+      description: Non-mutating middleware methods are reads rather than configuration changes.
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        Processor '{{{ _ingest.on_failure_processor_type }}}'
+        {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}'
+        {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'
+  - set:
+      field: event.kind
+      tag: set_pipeline_error_to_event_kind
+      value: pipeline_error
+  - append:
+      field: tags
+      value: preserve_original_event
+      allow_duplicates: false

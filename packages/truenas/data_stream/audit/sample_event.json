@@ -1,0 +1,125 @@
+{
+    "@timestamp": "2026-08-03T03:19:40.000Z",
+    "agent": {
+        "ephemeral_id": "6415987e-3cb8-4624-a832-c40c66413e90",
+        "id": "4572219a-b19e-45bf-9e39-90436223e7b3",
+        "name": "elastic-agent-48499",
+        "type": "filebeat",
+        "version": "9.4.3"
+    },
+    "data_stream": {
+        "dataset": "truenas.audit",
+        "namespace": "12494",
+        "type": "logs"
+    },
+    "destination": {
+        "ip": "192.0.2.12",
+        "port": 445
+    },
+    "ecs": {
+        "version": "9.3.0"
+    },
+    "elastic_agent": {
+        "id": "4572219a-b19e-45bf-9e39-90436223e7b3",
+        "snapshot": false,
+        "version": "9.4.3"
+    },
+    "event": {
+        "action": "smb-authentication",
+        "agent_id_status": "verified",
+        "category": [
+            "authentication"
+        ],
+        "created": "2026-08-03T03:19:41.000Z",
+        "dataset": "truenas.audit",
+        "id": "b0d01d97-4790-53cb-8e14-40464f89d807",
+        "ingested": "2026-08-04T05:01:12Z",
+        "kind": "event",
+        "module": "truenas",
+        "outcome": "success",
+        "provider": "SMB",
+        "type": [
+            "start"
+        ]
+    },
+    "input": {
+        "type": "cel"
+    },
+    "network": {
+        "protocol": "smb2"
+    },
+    "related": {
+        "hosts": [
+            "WS01"
+        ],
+        "ip": [
+            "192.0.2.11",
+            "192.0.2.12"
+        ],
+        "user": [
+            "bob"
+        ]
+    },
+    "source": {
+        "address": "192.0.2.11",
+        "as": {
+            "number": 64500,
+            "organization": {
+                "name": "Documentation ASN"
+            }
+        },
+        "geo": {
+            "city_name": "Las Vegas",
+            "continent_name": "North America",
+            "country_iso_code": "US",
+            "country_name": "United States",
+            "location": {
+                "coordinates": [
+                    -115.13722007162869,
+                    36.17496999911964
+                ],
+                "type": "Point"
+            },
+            "region_iso_code": "US-NV",
+            "region_name": "Nevada"
+        },
+        "ip": "192.0.2.11",
+        "port": 50383
+    },
+    "tags": [
+        "forwarded",
+        "truenas-audit"
+    ],
+    "truenas": {
+        "audit": {
+            "event_data": {
+                "netlogonNegotiateFlags": "0x00000000",
+                "netlogonSecureChannelType": "0"
+            },
+            "logon": {
+                "id": "0",
+                "type": 3
+            },
+            "mapped": {
+                "account": "bob",
+                "domain": "EXAMPLE"
+            },
+            "password_type": "NTLMv2",
+            "result": {
+                "type": "NTSTATUS",
+                "value_parsed": "SUCCESS",
+                "value_raw": 0
+            },
+            "workstation": "WS01"
+        }
+    },
+    "user": {
+        "domain": "EXAMPLE",
+        "effective": {
+            "domain": "nas01",
+            "id": "S-1-5-21-1000000000-2000000000-3000000000-1100",
+            "name": "bob"
+        },
+        "name": "bob"
+    }
+}

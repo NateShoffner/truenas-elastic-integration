@@ -1,0 +1,47 @@
+- name: truenas.alert
+  type: group
+  description: >-
+    TrueNAS alert fields that have no ECS equivalent, as returned by `GET /api/v2.0/alert/list`.
+  fields:
+    - name: source
+      type: keyword
+      description: >-
+        Component that generated the alert. Most alert classes leave it empty, in which case the field is not written.
+    - name: node
+      type: keyword
+      description: >-
+        Controller the alert was raised on. The host name on a single-controller system, and the failover label `Controller A` or `Controller B` on an HA pair.
+    - name: key
+      type: keyword
+      ignore_above: 8191
+      description: >-
+        Dedup key TrueNAS identifies recurring instances of an alert by, JSON-encoded as a string. It is derived from the alert arguments but is not always the whole of them: a `VolumeStatus` alert keys only on the pool name while its arguments also carry the pool state and the faulted devices. The API models the value as a string; the pipeline serialises any other shape to JSON so an unexpected shape cannot be rejected at index time.
+      multi_fields:
+        - name: text
+          type: text
+          default_field: false
+    - name: args
+      type: keyword
+      ignore_above: 8191
+      description: >-
+        Arguments the alert text is rendered with, stored as a string. These are the arguments of an arbitrary alert class, so the JSON shape differs per class: `PoolUpgraded` and `ScrubFinished` send a bare string, `VolumeStatus` sends an object, `NTPHealthCheck` sends null, and other classes send lists. No object mapping can accept every shape, so a non-string value is serialised to JSON and stored as a single string, while a value that already is a string is stored as-is. Not verbatim: the pipeline strips null-valued keys before encoding, so an argument the alert class passed explicitly as null is absent from this string. The payload exactly as TrueNAS sent it is in `event.original`.
+      multi_fields:
+        - name: text
+          type: text
+          default_field: false
+    - name: text
+      type: keyword
+      ignore_above: 8191
+      description: >-
+        Unrendered printf-style alert template, for example `Scrub of pool %r finished.`. It is identical for every occurrence of an alert class, so it is what alerts aggregate by, whereas the rendered form in `message` differs per occurrence.
+      multi_fields:
+        - name: text
+          type: text
+          default_field: false
+    - name: dismissed
+      type: boolean
+      description: Whether a user has dismissed the alert.
+    - name: one_shot
+      type: boolean
+      description: >-
+        Whether the alert has to be dismissed by hand. A one-shot alert reports a completed event and never clears itself; the others clear when the condition they report goes away.

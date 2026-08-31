@@ -1,0 +1,14 @@
+name: Set up elastic-package
+description: Downloads the pinned elastic-package release and puts it on PATH.
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        version="${ELASTIC_PACKAGE_VERSION#v}"
+        curl -fsSL \
+          "https://github.com/elastic/elastic-package/releases/download/v${version}/elastic-package_${version}_linux_amd64.tar.gz" \
+          | tar -xz -C /usr/local/bin elastic-package
+        elastic-package version

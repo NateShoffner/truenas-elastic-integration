@@ -1,0 +1,326 @@
+---
+description: Pipeline for parsing TrueNAS SMB audit records.
+processors:
+  # Service context
+  - rename:
+      field: json.service_data.service
+      tag: rename_share
+      target_field: truenas.audit.share
+      ignore_missing: true
+      description: Name of the SMB share the operation was performed on.
+  - rename:
+      field: json.service_data.session_id
+      tag: rename_session_id
+      target_field: truenas.audit.session_id
+      ignore_missing: true
+  - rename:
+      field: json.service_data.tcon_id
+      tag: rename_tcon_id
+      target_field: truenas.audit.tcon_id
+      ignore_missing: true
+
+  # Network endpoints
+  - grok:
+      field: json.event_data.remoteAddress
+      tag: grok_remote_address
+      patterns:
+        - '^ipv4:%{IPV4:source.ip}:%{POSINT:source.port:long}$'
+        - '^ipv6:%{GREEDYDATA:source.ip}:%{POSINT:source.port:long}$'
+      ignore_failure: true
+      if: ctx.json?.event_data?.remoteAddress != null
+      description: >-
+        Samba renders endpoints as `<family>:<address>:<port>`, but it falls back to other forms it
+        cannot resolve into that shape. An unmatched endpoint must not fail the record, because the
+        pipeline `on_failure` would then discard the identity, file and result parsing of the whole
+        record for the sake of one address.
+  - remove:
+      field: json.event_data.remoteAddress
+      tag: remove_remote_address
+      ignore_missing: true
+      if: ctx.source?.port != null
+      description: >-
+        Only drops the raw endpoint once the grok above has parsed it; `source.port` is written by
+        that grok alone. An endpoint in an unrecognised form is left in place and is carried by the
+        flattened `event_data` object instead of being silently lost.
+  - grok:
+      field: json.event_data.localAddress
+      tag: grok_local_address
+      patterns:
+        - '^ipv4:%{IPV4:destination.ip}:%{POSINT:destination.port:long}$'
+        - '^ipv6:%{GREEDYDATA:destination.ip}:%{POSINT:destination.port:long}$'
+      ignore_failure: true
+      if: ctx.json?.event_data?.localAddress != null
+      description: Same endpoint rendering and same failure tolerance as the remote address above.
+  - remove:
+      field: json.event_data.localAddress
+      tag: remove_local_address
+      ignore_missing: true
+      if: ctx.destination?.port != null
+      description: >-
+        Only drops the raw endpoint once the grok above has parsed it; `destination.port` is written
+        by that grok alone.
+
+  # Identities
+  - rename:
+      field: json.event_data.clientAccount
+      tag: rename_client_account
+      target_field: user.name
+      ignore_missing: true
+      if: ctx.user?.name == null
+  - remove:
+      field: json.event_data.clientAccount
+      tag: remove_client_account
+      ignore_missing: true
+  - rename:
+      field: json.event_data.clientDomain
+      tag: rename_client_domain
+      target_field: user.domain
+      ignore_missing: true
+  - rename:
+      field: json.event_data.becameAccount
+      tag: rename_became_account
+      target_field: user.effective.name
+      ignore_missing: true
+      description: Account the session was mapped onto after SMB authentication.
+  - rename:
+      field: json.event_data.becameDomain
+      tag: rename_became_domain
+      target_field: user.effective.domain
+      ignore_missing: true
+  - rename:
+      field: json.event_data.becameSid
+      tag: rename_became_sid
+      target_field: user.effective.id
+      ignore_missing: true
+  - rename:
+      field: json.event_data.mappedAccount
+      tag: rename_mapped_account
+      target_field: truenas.audit.mapped.account
+      ignore_missing: true
+  - rename:
+      field: json.event_data.mappedDomain
+      tag: rename_mapped_domain
+      target_field: truenas.audit.mapped.domain
+      ignore_missing: true
+  - rename:
+      field: json.event_data.workstation
+      tag: rename_workstation
+      target_field: truenas.audit.workstation
+      ignore_missing: true
+  - rename:
+      field: json.event_data.unix_token.uid
+      tag: rename_unix_token_uid
+      target_field: user.id
+      ignore_missing: true
+  - rename:
+      field: json.event_data.unix_token.gid
+      tag: rename_unix_token_gid
+      target_field: group.id
+      ignore_missing: true
+
+  # Logon context
+  - rename:
+      field: json.event_data.logonId
+      tag: rename_logon_id
+      target_field: truenas.audit.logon.id
+      ignore_missing: true
+  - rename:
+      field: json.event_data.logonType
+      tag: rename_logon_type
+      target_field: truenas.audit.logon.type
+      ignore_missing: true
+  - rename:
+      field: json.event_data.authDescription
+      tag: rename_auth_description
+      target_field: truenas.audit.auth_description
+      ignore_missing: true
+  - rename:
+      field: json.event_data.passwordType
+      tag: rename_password_type
+      target_field: truenas.audit.password_type
+      ignore_missing: true
+  - rename:
+      field: json.event_data.serviceDescription
+      tag: rename_service_description
+      target_field: network.protocol
+      ignore_missing: true
+      description: SMB dialect family, for example `SMB2`.
+  - lowercase:
+      field: network.protocol
+      tag: lowercase_network_protocol
+      ignore_missing: true
+
+  # File operations
+  - rename:
+      field: json.event_data.src_file
+      tag: rename_src_file
+      target_field: json.event_data.file
+      ignore_missing: true
+      if: ctx.json?.event_data?.file == null
+      description: RENAME records name the source file `src_file`.
+  - rename:
+      field: json.event_data.file.path
+      tag: rename_file_path
+      target_field: file.path
+      ignore_missing: true
+  - rename:
+      field: json.event_data.file.name
+      tag: rename_file_name
+      target_field: file.name
+      ignore_missing: true
+  - grok:
+      field: file.path
+      tag: grok_file_name_from_path
+      patterns:
+        - '^.*/(?<file.name>[^/]+)$'
+      if: ctx.file?.name == null && ctx.file?.path != null && ctx.file.path.contains('/')
+  - grok:
+      field: file.name
+      tag: grok_file_extension
+      patterns:
+        - '^.*\.(?<file.extension>[^.]+)$'
+      if: ctx.file?.name != null && ctx.file.name.contains('.')
+  - rename:
+      field: json.event_data.file_type
+      tag: rename_file_type
+      target_field: truenas.audit.file_type
+      ignore_missing: true
+  - rename:
+      field: json.event_data.file.type
+      tag: rename_nested_file_type
+      target_field: truenas.audit.file_type
+      ignore_missing: true
+      if: ctx.truenas?.audit?.file_type == null
+  - rename:
+      field: json.event_data.file.file_type
+      tag: rename_src_file_type
+      target_field: truenas.audit.file_type
+      ignore_missing: true
+      if: ctx.truenas?.audit?.file_type == null
+      description: >-
+        RENAME records key the source file's type as `file_type` inside the file object,
+        where CREATE and UNLINK use `type`. Without this the type of a renamed file is
+        never mapped and `file.type` stays unset.
+  - remove:
+      field: json.event_data.file.type
+      tag: remove_nested_file_type
+      ignore_missing: true
+      description: >-
+        CREATE records repeat the file type both at the event_data root and inside the file object.
+  - set:
+      field: file.type
+      tag: set_file_type_file
+      value: file
+      if: ctx.truenas?.audit?.file_type == 'REGULAR'
+  - set:
+      field: file.type
+      tag: set_file_type_dir
+      value: dir
+      if: ctx.truenas?.audit?.file_type == 'DIRECTORY'
+  - set:
+      field: file.type
+      tag: set_file_type_symlink
+      value: symlink
+      if: ctx.truenas?.audit?.file_type == 'SYMLINK'
+  - rename:
+      field: json.event_data.dst_file.path
+      tag: rename_dst_file_path
+      target_field: truenas.audit.dst_file.path
+      ignore_missing: true
+      description: Destination path of a RENAME operation. ECS has no destination-file field.
+  - rename:
+      field: json.event_data.parameters.CreateDisposition
+      tag: rename_create_disposition
+      target_field: truenas.audit.create_disposition
+      ignore_missing: true
+  - set:
+      field: event.type
+      tag: set_event_type_access_for_open
+      value:
+        - access
+      if: ctx.truenas?.audit?.create_disposition == 'OPEN'
+      description: An OPEN disposition requires an existing file, so the operation is an access, not a creation.
+
+  # Operation counters
+  - rename:
+      field: json.event_data.operations
+      tag: rename_operations
+      target_field: truenas.audit.operations
+      ignore_missing: true
+  - convert:
+      field: truenas.audit.operations.create
+      tag: convert_operations_create
+      type: long
+      ignore_missing: true
+  - convert:
+      field: truenas.audit.operations.close
+      tag: convert_operations_close
+      type: long
+      ignore_missing: true
+  - convert:
+      field: truenas.audit.operations.read
+      tag: convert_operations_read
+      type: long
+      ignore_missing: true
+  - convert:
+      field: truenas.audit.operations.write
+      tag: convert_operations_write
+      type: long
+      ignore_missing: true
+  - convert:
+      field: truenas.audit.operations.read_cnt
+      tag: convert_operations_read_cnt
+      type: long
+      ignore_missing: true
+  - convert:
+      field: truenas.audit.operations.read_bytes
+      tag: convert_operations_read_bytes
+      type: long
+      ignore_missing: true
+  - convert:
+      field: truenas.audit.operations.write_cnt
+      tag: convert_operations_write_cnt
+      type: long
+      ignore_missing: true
+  - convert:
+      field: truenas.audit.operations.write_bytes
+      tag: convert_operations_write_bytes
+      type: long
+      ignore_missing: true
+
+  # Result status
+  - rename:
+      field: json.event_data.result.type
+      tag: rename_result_type
+      target_field: truenas.audit.result.type
+      ignore_missing: true
+  - rename:
+      field: json.event_data.result.value_raw
+      tag: rename_result_value_raw
+      target_field: truenas.audit.result.value_raw
+      ignore_missing: true
+  - rename:
+      field: json.event_data.result.value_parsed
+      tag: rename_result_value_parsed
+      target_field: truenas.audit.result.value_parsed
+      ignore_missing: true
+  - set:
+      field: event.reason
+      tag: set_event_reason
+      copy_from: truenas.audit.result.value_parsed
+      if: ctx.event?.outcome == 'failure' && ctx.truenas?.audit?.result?.value_parsed != null
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        Processor '{{{ _ingest.on_failure_processor_type }}}'
+        {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}'
+        {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'
+  - set:
+      field: event.kind
+      tag: set_pipeline_error_to_event_kind
+      value: pipeline_error
+  - append:
+      field: tags
+      value: preserve_original_event
+      allow_duplicates: false

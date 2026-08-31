@@ -1,0 +1,181 @@
+interval: {{interval}}
+resource.tracer:
+  enabled: {{enable_request_tracer}}
+  filename: "../../logs/cel/http-request-trace-*.ndjson"
+  maxbackups: 5
+{{#if proxy_url}}
+resource.proxy_url: {{proxy_url}}
+{{/if}}
+{{#if ssl}}
+resource.ssl: {{ssl}}
+{{/if}}
+{{#if http_client_timeout}}
+resource.timeout: {{http_client_timeout}}
+{{/if}}
+resource.url: {{url}}
+state:
+  api_key: {{api_key}}
+  batch_size: {{batch_size}}
+  initial_interval: {{initial_interval}}
+  audit_services:
+{{#each audit_services as |service|}}
+    - {{service}}
+{{/each}}
+redact:
+  fields:
+    - api_key
+program: |-
+  // TrueNAS SCALE audit records: POST /api/v2.0/audit/query.
+  //
+  // Offset/limit pagination inside a poll, timestamp high-water mark across polls.
+  // The response is a flat JSON array with no pagination metadata, so a page
+  // shorter than the requested limit ends the round.
+  //
+  // State:
+  // cursor.last_timestamp  persistent  message_timestamp high-water mark (epoch s)
+  // offset                 transient   offset of the next page in the current round
+  // bookmark               transient   running max message_timestamp of the round
+  //
+  // offset/bookmark live in plain state so they survive want_more re-evaluations
+  // but are lost on restart, which restarts an interrupted round cleanly at
+  // offset 0. The time filter is held steady while paginating and only advanced
+  // on the terminal page, so an advanced filter can never be combined with an
+  // advanced offset.
+  {
+    "since": int(state.?cursor.last_timestamp.orValue(int(now - duration(state.initial_interval)))),
+    "offset": int(state.?offset.orValue(0)),
+    "bookmark": int(state.?bookmark.orValue(0)),
+  }.as(cur,
+    state.with(
+      request(
+        "POST",
+        state.url.trim_right("/") + "/api/v2.0/audit/query",
+        {
+          "services": state.audit_services,
+          "query-filters": [["message_timestamp", ">", cur.since]],
+          "query-options": {
+            "order_by": ["message_timestamp"],
+            "limit": int(state.batch_size),
+            "offset": cur.offset,
+          },
+        }.encode_json()
+      ).with(
+        {
+          "Header": {
+            "Authorization": ["Bearer " + state.api_key],
+            "Content-Type": ["application/json"],
+            "Accept": ["application/json"],
+          },
+        }
+      ).do_request().as(resp,
+        (resp.StatusCode == 200) ?
+          try(resp.Body.decode_json()).as(body,
+            // The audit query returns a flat JSON array; anything else is a
+            // protocol error (mirrors the isinstance(body, list) check).
+            (is_error(body) || type(body) != type([])) ?
+              {
+                "events": {
+                  "error": {
+                    "code": string(resp.StatusCode),
+                    "id": "unexpected_body",
+                    "message": "POST /api/v2.0/audit/query: unexpected response body: " + string(resp.Body),
+                  },
+                },
+                // The error event deletes the cursor, so the in-flight round must
+                // be abandoned too: restart cleanly at offset 0 on the next poll.
+                "offset": 0,
+                "bookmark": 0,
+                "want_more": false,
+              }
+            :
+              {
+                // A short page ends the round (mirrors want_more = got == batch_size).
+                "more": size(body) == int(state.batch_size),
+                // Records are ordered ascending by message_timestamp, so the last
+                // record of the page carries the round's high-water mark.
+                "max_ts": (size(body) != 0) ?
+                  int(body[size(body) - 1].message_timestamp)
+                :
+                  cur.bookmark,
+              }.as(page,
+                {
+                  // A terminal page can be empty while still promoting the round's
+                  // bookmark; a placeholder event keeps the cursor update durable.
+                  "events": (size(body) != 0) ?
+                    dyn(body.map(e, {"message": e.encode_json()}))
+                  :
+                    dyn([{"retry": true}]),
+                  // Transient round state: advance while paginating, reset at round end.
+                  "offset": page.more ? (cur.offset + int(state.batch_size)) : 0,
+                  "bookmark": page.more ? page.max_ts : 0,
+                  // Hold the time filter steady while paginating; promote the round's
+                  // high-water mark only on the terminal page, and hold it back by
+                  // one second. message_timestamp has second granularity and the
+                  // next round filters with a strict `>`, so promoting the exact
+                  // mark would permanently drop every record written into that same
+                  // second after the terminal page was queried, which is likely on
+                  // a busy SMB server. The overlap is deliberate: the boundary
+                  // second is re-queried and the resulting duplicates are idempotent
+                  // because the ingest pipeline derives `_id` from the record GUID.
+                  "cursor": {
+                    "last_timestamp": page.more ?
+                      cur.since
+                    : (page.max_ts != 0) ? (page.max_ts - 1) : cur.since,
+                  },
+                  "want_more": page.more,
+                }
+              )
+          )
+        :
+          // A 401 carries a text/plain body, not JSON, so the body is passed
+          // through verbatim rather than decoded.
+          {
+            "code": string(resp.StatusCode),
+            "id": string(resp.Status),
+            "message": "POST /api/v2.0/audit/query: " + ((size(resp.Body) != 0) ? string(resp.Body) : string(resp.Status)),
+          }.as(err,
+            // A 4xx other than 429 is a persistent client error, most often an
+            // expired, revoked or HTTPS-revoked API key, and retrying it
+            // changes nothing. The array error shape keeps the persisted cursor
+            // and hands the error document to the pipeline's terminate
+            // processor. The single-object shape would delete the cursor, so
+            // once the credential is repaired collection would restart at
+            // now - initial_interval, and everything older than that window
+            // that accumulated during the outage would be lost. 429 and 5xx are
+            // transient, so they keep the object shape and let the cursor be
+            // dropped and the round retried.
+            (resp.StatusCode >= 400 && resp.StatusCode < 500 && resp.StatusCode != 429) ?
+              {
+                "events": dyn([{"error": err}]),
+                // Restated explicitly rather than left to state propagation:
+                // surviving the error is the entire point of this branch.
+                "cursor": {"last_timestamp": cur.since},
+                // The round is abandoned either way: restart cleanly at
+                // offset 0 on the next poll.
+                "offset": 0,
+                "bookmark": 0,
+                "want_more": false,
+              }
+            :
+              {
+                "events": dyn({"error": err}),
+                "offset": 0,
+                "bookmark": 0,
+                "want_more": false,
+              }
+          )
+      )
+    )
+  )
+tags:
+{{#each tags as |tag|}}
+  - {{tag}}
+{{/each}}
+{{#contains "forwarded" tags}}
+publisher_pipeline.disable_host: true
+{{/contains}}
+processors:
+- drop_event.when.equals.retry: true
+{{#if processors}}
+{{processors}}
+{{/if}}

@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+# Needed to create the release and upload the package zip to it.
+permissions:
+  contents: write
+
+env:
+  ELASTIC_PACKAGE_VERSION: v0.125.1
+
+jobs:
+  release:
+    name: Build and publish package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elastic-package
+        uses: ./.github/actions/setup-elastic-package
+
+      # The tag is the source of truth for what gets published, but the package
+      # version comes from manifest.yml. If they disagree the release would be
+      # mislabelled, so fail loudly rather than publish a confusing artifact.
+      - name: Verify tag matches package version
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME#v}"
+          manifest=$(python3 -c "import yaml;print(yaml.safe_load(open('manifest.yml'))['version'])")
+          echo "tag=$tag manifest=$manifest"
+          if [ "$tag" != "$manifest" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match manifest.yml version $manifest"
+            exit 1
+          fi
+        working-directory: packages/truenas
+
+      - name: Check and build package
+        run: elastic-package check -v
+        working-directory: packages/truenas
+
+      - name: Extract changelog entry for this version
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' > "$RUNNER_TEMP/notes.md"
+          import os, yaml
+          version = os.environ["GITHUB_REF_NAME"].lstrip("v")
+          entries = yaml.safe_load(open("packages/truenas/changelog.yml"))
+          entry = next((e for e in entries if str(e["version"]) == version), None)
+          if entry:
+              for change in entry.get("changes", []):
+                  line = f"- {change['description']} (`{change['type']}`)"
+                  link = change.get("link", "")
+                  num = link.rstrip("/").rsplit("/", 1)[-1]
+                  if link and num.isdigit():
+                      line += f" [#{num}]({link})"
+                  print(line)
+          else:
+              print(f"No changelog entry found for {version}.")
+          print()
+          print("Install with **Kibana > Integrations > Upload integration**, "
+                "or `elastic-package install --zip <file>`.")
+          PY
+          cat "$RUNNER_TEMP/notes.md"
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "$GITHUB_REF_NAME" \
+            build/packages/*.zip \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file "$RUNNER_TEMP/notes.md"

@@ -1,0 +1,25 @@
+wait_for_data_timeout: 1m
+input: cel
+service: truenas-audit-mock
+vars:
+  url: http://{{Hostname}}:{{Port}}
+  api_key: 1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+data_stream:
+  vars:
+    interval: 2s
+    initial_interval: 24h
+    batch_size: 2
+    audit_services:
+      - MIDDLEWARE
+      - SMB
+      - SUDO
+assert:
+  # Round 1 paginates over three pages (2 + 2 + 1 records) and persists the
+  # bookmark 1785770999, one second below the highest message_timestamp of the
+  # round so the boundary second is re-queried. Round 2 resumes from that
+  # bookmark and collects a single record. Every later round matches the
+  # steady-state mock rule and returns an empty array, so the count stays fixed
+  # for the rest of the run.
+  # If the cursor were ever lost, round 2 would replay round 1 and the count
+  # would exceed this value.
+  hit_count: 6

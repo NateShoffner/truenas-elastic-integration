@@ -1,0 +1,7 @@
+# elastic-package build output (repo root only, not packages/*/_dev/build)
+/build/
+*.tar.gz
+
+# Raw API captures from live TrueNAS systems. Never commit: contains real
+# hostnames, LAN addresses, and a vendored copy of the TrueNAS middleware source.
+research_results/

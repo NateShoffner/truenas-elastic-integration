@@ -1,0 +1,171 @@
+- name: truenas.audit
+  type: group
+  description: >-
+    TrueNAS audit record fields that have no ECS equivalent, as returned by `POST /api/v2.0/audit/query`.
+  fields:
+    - name: session
+      type: keyword
+      description: >-
+        Client session identifier from the record envelope. A GUID for MIDDLEWARE records, a numeric session id for SUDO, and absent for some SMB records.
+    - name: protocol
+      type: keyword
+      description: >-
+        Transport the middleware call arrived on, either `REST` or `WEBSOCKET`.
+    - name: method
+      type: keyword
+      description: Middleware API method invoked by a `METHOD_CALL` record, for example `user.create`.
+    - name: params
+      type: keyword
+      ignore_above: 8191
+      description: >-
+        Arguments the middleware API method was called with, JSON-encoded as a string. These are the arguments of an arbitrary API method, so the JSON shape differs per method: `user.create` sends an array of objects, `pool.scrub.scrub` sends an array of bare strings, and other methods send mixed, nested, or empty arrays. No object mapping can accept every shape, so a non-string value is serialised and stored as a single string, while a value that already is a string is stored as-is. Not verbatim: the pipeline strips null-valued keys before encoding, so an argument the caller passed explicitly as null is absent from this string. The payload exactly as TrueNAS sent it is in `event.original`.
+      multi_fields:
+        - name: text
+          type: text
+          default_field: false
+    - name: authenticated
+      type: boolean
+      description: Whether the caller was authenticated when the middleware method was invoked.
+    - name: authorized
+      type: boolean
+      description: Whether the caller was authorized to invoke the middleware method.
+    - name: credentials
+      type: group
+      fields:
+        - name: type
+          type: keyword
+          description: >-
+            Kind of credential the session was established with, for example `LOGIN_PASSWORD`, `API_KEY`, or `TOKEN`.
+        - name: data
+          type: flattened
+          ignore_above: 8191
+          description: >-
+            Credential details recorded with the session. The shape varies per credential type, so it is mapped as a flattened object. The pipeline only promotes the payload when the API delivers it as an object, so an unexpected shape cannot be rejected at index time.
+    - name: reason
+      type: keyword
+      description: Reason recorded with MIDDLEWARE `REBOOT` and `SHUTDOWN` records.
+    - name: shell_type
+      type: keyword
+      description: >-
+        Target of a web shell session, one of `HOST`, `VM`, `CONTAINER`, or `APP`.
+    - name: share
+      type: keyword
+      description: Name of the SMB share the audited operation was performed on.
+    - name: session_id
+      type: keyword
+      description: SMB session identifier assigned by the SMB server.
+    - name: tcon_id
+      type: keyword
+      description: SMB tree connect identifier of the share connection.
+    - name: logon
+      type: group
+      fields:
+        - name: id
+          type: keyword
+          description: SMB logon identifier.
+        - name: type
+          type: long
+          description: >-
+            Windows logon type of the SMB authentication, for example `3` for a network logon.
+    - name: auth_description
+      type: keyword
+      description: Free-form description of the SMB authentication method.
+    - name: password_type
+      type: keyword
+      description: Password protocol used for the SMB authentication, for example `NTLMv2`.
+    - name: workstation
+      type: keyword
+      description: NetBIOS machine name the SMB client announced.
+    - name: mapped
+      type: group
+      fields:
+        - name: account
+          type: keyword
+          description: Account name the SMB client was mapped to by the identity mapping backend.
+        - name: domain
+          type: keyword
+          description: Domain of the mapped SMB account.
+    - name: file_type
+      type: keyword
+      description: >-
+        Raw TrueNAS file type of the SMB target, one of `BLOCK`, `CHARACTER`, `FIFO`, `REGULAR`, `DIRECTORY`, or `SYMLINK`.
+    - name: create_disposition
+      type: keyword
+      description: >-
+        Disposition requested by an SMB `CREATE` operation, one of `SUPERSEDE`, `OVERWRITE_IF`, `OPEN`, `CREATE`, `OPEN_IF`, or `UNKNOWN`.
+    - name: dst_file
+      type: group
+      fields:
+        - name: path
+          type: keyword
+          description: >-
+            Destination path of an SMB `RENAME` operation. ECS has no destination-file field.
+    - name: operations
+      type: group
+      description: Per-handle operation counters reported by SMB `CLOSE` and `DISCONNECT` records.
+      fields:
+        - name: create
+          type: long
+          description: Number of create operations performed on the tree connect.
+        - name: close
+          type: long
+          description: Number of close operations performed on the tree connect.
+        - name: read
+          type: long
+          description: Number of read operations performed on the tree connect.
+        - name: write
+          type: long
+          description: Number of write operations performed on the tree connect.
+        - name: read_cnt
+          type: long
+          description: Number of read operations performed on the file handle.
+        - name: read_bytes
+          type: long
+          unit: byte
+          description: Number of bytes read through the file handle.
+        - name: write_cnt
+          type: long
+          description: Number of write operations performed on the file handle.
+        - name: write_bytes
+          type: long
+          unit: byte
+          description: Number of bytes written through the file handle.
+    - name: result
+      type: group
+      description: Status the audited SMB operation completed with.
+      fields:
+        - name: type
+          type: keyword
+          description: Status namespace of the result, either `NTSTATUS` or `UNIX`.
+        - name: value_raw
+          type: long
+          description: Numeric status code of the audited operation.
+        - name: value_parsed
+          type: keyword
+          description: Symbolic status name of the audited operation, for example `SUCCESS`.
+    - name: syscall
+      type: group
+      description: Linux audit syscall context carried by SYSTEM records on TrueNAS 25.10 and later.
+      fields:
+        - name: name
+          type: keyword
+          description: Name of the audited syscall.
+        - name: tty
+          type: keyword
+          description: Terminal the audited syscall was issued from.
+        - name: auid
+          type: long
+          description: Linux audit login uid, the numeric identity the session was originally authenticated as.
+        - name: audit_user
+          type: keyword
+          description: Resolved user name for the Linux audit login uid.
+    - name: service_data
+      type: flattened
+      ignore_above: 8191
+      description: >-
+        Service context that was not promoted to a dedicated field. The shape varies per service, so it is mapped as a flattened object. The pipeline only writes this field when the remaining payload is a non-empty object, which is the one shape a flattened mapping accepts at its root. Not verbatim: null-valued keys are stripped before the object is stored, and TrueNAS returns every optional key of a record explicitly as null. The payload exactly as TrueNAS sent it is in `event.original`.
+    - name: event_data
+      type: flattened
+      ignore_above: 8191
+      description: >-
+        Event payload that was not promoted to a dedicated field. The shape varies per service and per event type, so it is mapped as a flattened object. The pipeline only writes this field when the remaining payload is a non-empty object, which is the one shape a flattened mapping accepts at its root. Not verbatim: null-valued keys are stripped before the object is stored, and TrueNAS returns every optional key of a record explicitly as null. The payload exactly as TrueNAS sent it is in `event.original`.

@@ -1,0 +1,125 @@
+rules:
+  # TrueNAS REST API v2.0 audit query mock.
+  #
+  # The CEL program POSTs to /api/v2.0/audit/query with a JSON body of the form
+  #   {"services":[...],"query-filters":[["message_timestamp",">",<epoch>]],
+  #    "query-options":{"limit":N,"offset":M,"order_by":["message_timestamp"]}}
+  # There is no cursor token in the response; the response is a flat JSON array.
+  #
+  # Rules are matched top-down, first match wins. Rules are ordered so that the
+  # cursor-resume rounds (matched on the persisted message_timestamp value) are
+  # tested before the offset-based first-round rules. If the CEL program ever
+  # loses the persisted cursor it falls through to the round 1 offset:0 rule and
+  # re-collects all five round 1 records, pushing hit_count above the asserted
+  # value — this is the cursor regression guard.
+  #
+  # The program promotes the terminal page's message_timestamp minus one second,
+  # because message_timestamp has second granularity and the next round filters
+  # with a strict `>`. The filter values the later rounds are matched on are
+  # therefore one below the highest message_timestamp of the preceding round.
+  #
+  # Round 1 (first poll, filter = now - initial_interval), batch_size 2:
+  #   offset 0 -> 2 records  (want_more)
+  #   offset 2 -> 2 records  (want_more)
+  #   offset 4 -> 1 record   (terminal; max message_timestamp 1785771000,
+  #                           persisted mark 1785770999)
+  # Round 2 (filter = 1785770999): 1 record (terminal; max message_timestamp
+  #                           1785774600, persisted mark 1785774599)
+  # Round 3+ (filter = 1785774599): empty array, steady state.
+  #
+  # Total indexed documents: 5 (round 1) + 1 (round 2) = 6.
+
+  # ---------------------------------------------------------------------------
+  # Round 3+ — steady state, nothing new since the round 2 bookmark.
+  # ---------------------------------------------------------------------------
+  - path: /api/v2.0/audit/query
+    methods: ['POST']
+    request_body: '/.*1785774599.*/'
+    request_headers:
+      Authorization:
+        - 'Bearer 1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+    responses:
+      - status_code: 200
+        headers:
+          Content-Type:
+            - 'application/json'
+        body: '[]'
+  # ---------------------------------------------------------------------------
+  # Round 2 — resumed from the cursor persisted at the end of round 1.
+  # ---------------------------------------------------------------------------
+  - path: /api/v2.0/audit/query
+    methods: ['POST']
+    request_body: '/.*1785770999.*/'
+    request_headers:
+      Authorization:
+        - 'Bearer 1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+    responses:
+      - status_code: 200
+        headers:
+          Content-Type:
+            - 'application/json'
+        body: |-
+          [{"audit_id":"3f5a1c02-9b41-5f77-a0d2-6c1e93b47a55","message_timestamp":1785774600,"timestamp":{"$date":1785774600000},"address":"192.0.2.11","username":"root","session":"7c9b2f10-2a55-5f30-9a41-d2f0b6a1c334","service":"MIDDLEWARE","service_data":{"vers":{"major":0,"minor":1},"origin":"192.0.2.11","protocol":"WEBSOCKET","credentials":{"credentials":"API_KEY","credentials_data":{"api_key_id":1,"username":"root"}}},"event":"METHOD_CALL","event_data":{"method":"pool.scrub.scrub","params":["tank","START"],"description":"Scrub pool tank","authenticated":true,"authorized":true},"success":true}]
+  # ---------------------------------------------------------------------------
+  # Round 1 page 3 — terminal page (1 record < batch_size).
+  # ---------------------------------------------------------------------------
+  - path: /api/v2.0/audit/query
+    methods: ['POST']
+    request_body: '/.*"offset": ?4[,}].*/'
+    request_headers:
+      Authorization:
+        - 'Bearer 1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+    responses:
+      - status_code: 200
+        headers:
+          Content-Type:
+            - 'application/json'
+        body: |-
+          [{"audit_id":"e2f2f4a0-6b6f-5f2e-9c1a-1b0d4c7e9a21","message_timestamp":1785771000,"timestamp":{"$date":1785771000123},"address":"192.0.2.20","username":"alice","session":"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d","service":"SMB","service_data":{"vers":{"major":0,"minor":1},"service":"projects","session_id":"1234567890","tcon_id":"987654321"},"event":"CREATE","event_data":{"parameters":{"DesiredAccess":"0x20089","FileAttributes":"0x80","ShareAccess":"0x7","CreateDisposition":"OPEN_IF","CreateOptions":"0x44"},"file_type":"REGULAR","file":{"path":"/mnt/tank/projects/report.docx","stream":null,"snap":null,"type":"REGULAR","name":"report.docx"},"result":{"type":"NTSTATUS","value_raw":0,"value_parsed":"SUCCESS"},"vers":{"major":0,"minor":1}},"success":true}]
+  # ---------------------------------------------------------------------------
+  # Round 1 page 2 — full page, more to follow.
+  # ---------------------------------------------------------------------------
+  - path: /api/v2.0/audit/query
+    methods: ['POST']
+    request_body: '/.*"offset": ?2[,}].*/'
+    request_headers:
+      Authorization:
+        - 'Bearer 1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+    responses:
+      - status_code: 200
+        headers:
+          Content-Type:
+            - 'application/json'
+        body: |-
+          [{"audit_id":"1d81a139-33c4-556c-8765-fccf857cb11b","message_timestamp":1785736163,"timestamp":{"$date":1785736163000},"address":"192.0.2.11","username":"root","session":"d4a59016-64c6-5b12-bd70-e1bcabb6c5df","service":"MIDDLEWARE","service_data":{"vers":{"major":0,"minor":1},"origin":"192.0.2.11","protocol":"WEBSOCKET","credentials":{"credentials":"LOGIN_PASSWORD","credentials_data":{"username":"root"}}},"event":"AUTHENTICATION","event_data":{"credentials":{"credentials":"LOGIN_PASSWORD","credentials_data":{"username":"root"}},"error":null},"success":true},{"audit_id":"842d5418-3d94-5638-be3b-56e4c576981c","message_timestamp":1785767619,"timestamp":{"$date":1785767619000},"address":"192.0.2.11","username":"root","session":"42073035-4640-5824-bd1c-902c2f912388","service":"MIDDLEWARE","service_data":{"vers":{"major":0,"minor":1},"origin":"192.0.2.11","protocol":"WEBSOCKET","credentials":{"credentials":"LOGIN_PASSWORD","credentials_data":{"username":"root"}}},"event":"METHOD_CALL","event_data":{"method":"user.create","params":[{"uid":3000,"username":"alice","home":"/var/empty","shell":"/usr/sbin/nologin","full_name":"monitoring","smb":true,"group":48,"groups":[],"password_disabled":false,"ssh_password_enabled":false,"sshpubkey":null,"locked":false,"sudo_commands":[],"sudo_commands_nopasswd":[],"email":null,"group_create":false,"home_create":false,"password":"********"}],"description":"Create user monitoring","authenticated":true,"authorized":true},"success":true}]
+  # ---------------------------------------------------------------------------
+  # Round 1 page 1 — full page, more to follow. Also the fall-through rule that
+  # fires if the persisted cursor is ever lost (regression guard).
+  # ---------------------------------------------------------------------------
+  - path: /api/v2.0/audit/query
+    methods: ['POST']
+    request_body: '/.*"offset": ?0[,}].*/'
+    request_headers:
+      Authorization:
+        - 'Bearer 1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+    responses:
+      - status_code: 200
+        headers:
+          Content-Type:
+            - 'application/json'
+        body: |-
+          [{"audit_id":"b0d01d97-4790-53cb-8e14-40464f89d807","message_timestamp":1785727181,"timestamp":{"$date":1785727180000},"address":"192.0.2.11","username":"bob","session":"","service":"SMB","service_data":{"vers":{"major":0,"minor":1},"service":null,"session_id":null,"tcon_id":null},"event":"AUTHENTICATION","event_data":{"logonId":"0","logonType":3,"localAddress":"ipv4:192.0.2.12:445","remoteAddress":"ipv4:192.0.2.11:50383","serviceDescription":"SMB2","authDescription":null,"clientDomain":"EXAMPLE","clientAccount":"bob","workstation":"WS01","becameAccount":"bob","becameDomain":"nas01","becameSid":"S-1-5-21-1000000000-2000000000-3000000000-1100","mappedAccount":"bob","mappedDomain":"EXAMPLE","netlogonComputer":null,"netlogonTrustAccount":null,"netlogonNegotiateFlags":"0x00000000","netlogonSecureChannelType":0,"netlogonTrustAccountSid":null,"passwordType":"NTLMv2","clientPolicyAccessCheck":null,"serverPolicyAccessCheck":null,"vers":{"major":0,"minor":1},"result":{"type":"NTSTATUS","value_raw":0,"value_parsed":"SUCCESS"}},"success":true},{"audit_id":"98c0dabf-cc6b-5566-aa81-5f6628b488f0","message_timestamp":1785729301,"timestamp":{"$date":1785729301000},"address":"nas01.local","username":"root","session":"1751290","service":"SUDO","service_data":{"vers":{"major":0,"minor":1}},"event":"ACCEPT","event_data":{"sudo":{"accept":{"uuid":"98c0dabf-cc6b-5566-aa81-5f6628b488f0","submituser":"root","submithost":"nas01.local","submitcwd":"/","submit_time":{"seconds":"1785729301","nanoseconds":"443315975","localtime":"Aug  2 23:55:01","iso8601":"20260803035501Z"},"server_time":{"seconds":"1785729301","nanoseconds":"447431640","localtime":"Aug  2 23:55:01","iso8601":"20260803035501Z"},"runuser":"root","runuid":"0","runenv":"LANG=C.UTF-8,PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin,TZ=America/New_York,MAIL=/var/mail/root,LOGNAME=root,USER=root,HOME=/root,SHELL=/usr/bin/zsh,TERM=unknown,\"SUDO_COMMAND=/bin/sh -c sh /mnt/nas01/backups/nas01/BackupConfig.sh > /dev/null\",SUDO_USER=root,SUDO_UID=0,SUDO_GID=0","runcwd":"/","runargv":"sh,-c,\"sh /mnt/nas01/backups/nas01/BackupConfig.sh > /dev/null\"","lines":"24","command":"/bin/sh","columns":"80"}}},"success":true}]
+  # ---------------------------------------------------------------------------
+  # Wrong or missing API key. The TrueNAS middleware answers with HTTP 401 and a
+  # text/plain body ("Invalid API key"), not JSON, so the CEL program's error
+  # branch must never assume the error body is decodable. Placed last so it only
+  # fires when the authenticated rules above did not match.
+  # ---------------------------------------------------------------------------
+  - path: /api/v2.0/audit/query
+    methods: ['POST']
+    responses:
+      - status_code: 401
+        headers:
+          Content-Type:
+            - 'text/plain; charset=utf-8'
+        body: 'Invalid API key'

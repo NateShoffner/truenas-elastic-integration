@@ -1,0 +1,167 @@
+{
+    "expected": [
+        {
+            "@timestamp": "2026-08-03T08:45:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "NTPHealthCheck",
+                "category": [
+                    "host"
+                ],
+                "id": "5a4b3c2d-1e0f-59a8-8b7c-6d5e4f3a2b1c",
+                "kind": "alert",
+                "original": "{\"uuid\": \"5a4b3c2d-1e0f-59a8-8b7c-6d5e4f3a2b1c\", \"source\": \"NTPHealthCheck\", \"klass\": \"NTPHealthCheck\", \"args\": null, \"node\": \"nas01\", \"key\": \"null\", \"datetime\": {\"$date\": 1785746700000}, \"last_occurrence\": {\"$date\": 1785746700000}, \"dismissed\": false, \"mail\": null, \"text\": \"No NTP peers are reachable.\", \"id\": \"5a4b3c2d-1e0f-59a8-8b7c-6d5e4f3a2b1c\", \"level\": \"WARNING\", \"formatted\": null, \"one_shot\": false}",
+                "severity": 3,
+                "start": "2026-08-03T08:45:00.000Z",
+                "type": [
+                    "info"
+                ]
+            },
+            "log": {
+                "level": "warning"
+            },
+            "message": "No NTP peers are reachable.",
+            "related": {
+                "hosts": [
+                    "nas01"
+                ]
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "alert": {
+                    "dismissed": false,
+                    "key": "null",
+                    "node": "nas01",
+                    "one_shot": false,
+                    "source": "NTPHealthCheck",
+                    "text": "No NTP peers are reachable."
+                }
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T09:10:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "SMART",
+                "category": [
+                    "host"
+                ],
+                "id": "b1c2d3e4-f5a6-5b7c-8d9e-0f1a2b3c4d5e",
+                "kind": "alert",
+                "original": "{\"uuid\": \"b1c2d3e4-f5a6-5b7c-8d9e-0f1a2b3c4d5e\", \"source\": \"\", \"klass\": \"SMART\", \"args\": {\"device\": \"sda\", \"message\": \"Device: /dev/sda, 8 Currently unreadable (pending) sectors\"}, \"node\": \"nas01\", \"key\": \"{\\\"device\\\": \\\"sda\\\"}\", \"datetime\": {\"$date\": 1785748200000}, \"last_occurrence\": {\"$date\": 1785748200000}, \"dismissed\": false, \"mail\": null, \"text\": \"%(message)s.\", \"id\": \"b1c2d3e4-f5a6-5b7c-8d9e-0f1a2b3c4d5e\", \"level\": \"ERROR\", \"formatted\": \"Device: /dev/sda, 8 Currently unreadable (pending) sectors.\", \"one_shot\": false}",
+                "severity": 4,
+                "start": "2026-08-03T09:10:00.000Z",
+                "type": [
+                    "info"
+                ]
+            },
+            "log": {
+                "level": "error"
+            },
+            "message": "Device: /dev/sda, 8 Currently unreadable (pending) sectors.",
+            "related": {
+                "hosts": [
+                    "nas01"
+                ]
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "alert": {
+                    "args": "{\"message\":\"Device: /dev/sda, 8 Currently unreadable (pending) sectors\",\"device\":\"sda\"}",
+                    "dismissed": false,
+                    "key": "{\"device\": \"sda\"}",
+                    "node": "nas01",
+                    "one_shot": false,
+                    "text": "%(message)s."
+                }
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T09:30:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "FailoverFailed",
+                "category": [
+                    "host"
+                ],
+                "id": "c2d3e4f5-a6b7-5c8d-9e0f-1a2b3c4d5e6f",
+                "kind": "alert",
+                "original": "{\"uuid\": \"c2d3e4f5-a6b7-5c8d-9e0f-1a2b3c4d5e6f\", \"source\": \"\", \"klass\": \"FailoverFailed\", \"args\": [\"Controller A\", \"Controller B\"], \"node\": \"Controller B\", \"key\": \"[\\\"Controller A\\\", \\\"Controller B\\\"]\", \"datetime\": {\"$date\": 1785748800000}, \"last_occurrence\": {\"$date\": 1785749400000}, \"dismissed\": false, \"mail\": null, \"text\": \"Failover failed from %s to %s.\", \"id\": \"c2d3e4f5-a6b7-5c8d-9e0f-1a2b3c4d5e6f\", \"level\": \"ALERT\", \"formatted\": \"Failover failed from Controller A to Controller B.\", \"one_shot\": false}",
+                "severity": 6,
+                "start": "2026-08-03T09:20:00.000Z",
+                "type": [
+                    "info"
+                ]
+            },
+            "log": {
+                "level": "alert"
+            },
+            "message": "Failover failed from Controller A to Controller B.",
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "alert": {
+                    "args": "[\"Controller A\",\"Controller B\"]",
+                    "dismissed": false,
+                    "key": "[\"Controller A\", \"Controller B\"]",
+                    "node": "Controller B",
+                    "one_shot": false,
+                    "text": "Failover failed from %s to %s."
+                }
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T09:35:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "UPSLowBattery",
+                "category": [
+                    "host"
+                ],
+                "id": "d3e4f5a6-b7c8-5d9e-8f0a-2b3c4d5e6f70",
+                "kind": "alert",
+                "original": "{\"uuid\": \"d3e4f5a6-b7c8-5d9e-8f0a-2b3c4d5e6f70\", \"source\": \"\", \"klass\": \"UPSLowBattery\", \"args\": {\"ups\": \"ups01\", \"charge\": \"5\"}, \"node\": \"nas01\", \"key\": \"{\\\"ups\\\": \\\"ups01\\\"}\", \"datetime\": {\"$date\": 1785749700000}, \"last_occurrence\": {\"$date\": 1785749700000}, \"dismissed\": true, \"mail\": null, \"text\": \"UPS %(ups)s battery charge is %(charge)s%%, shutting down.\", \"id\": \"d3e4f5a6-b7c8-5d9e-8f0a-2b3c4d5e6f70\", \"level\": \"EMERGENCY\", \"formatted\": \"UPS ups01 battery charge is 5%, shutting down.\", \"one_shot\": true}",
+                "severity": 7,
+                "start": "2026-08-03T09:35:00.000Z",
+                "type": [
+                    "info"
+                ]
+            },
+            "log": {
+                "level": "emergency"
+            },
+            "message": "UPS ups01 battery charge is 5%, shutting down.",
+            "related": {
+                "hosts": [
+                    "nas01"
+                ]
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "alert": {
+                    "args": "{\"charge\":\"5\",\"ups\":\"ups01\"}",
+                    "dismissed": true,
+                    "key": "{\"ups\": \"ups01\"}",
+                    "node": "nas01",
+                    "one_shot": true,
+                    "text": "UPS %(ups)s battery charge is %(charge)s%%, shutting down."
+                }
+            }
+        }
+    ]
+}

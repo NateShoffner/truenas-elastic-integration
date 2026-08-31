@@ -1,0 +1,64 @@
+format_version: "3.4.2"
+name: truenas
+title: "TrueNAS"
+version: "0.1.0"
+source:
+  license: "Elastic-2.0"
+description: "Collect audit records and system alerts from TrueNAS with Elastic Agent."
+type: integration
+categories:
+  - security
+  - os_system
+conditions:
+  kibana:
+    version: "^8.19.0 || ^9.1.0"
+  elastic:
+    subscription: "basic"
+icons:
+  - src: /img/truenas-logo.svg
+    title: TrueNAS logo
+    size: 32x32
+    type: image/svg+xml
+policy_templates:
+  - name: truenas
+    title: TrueNAS logs
+    description: Collect audit records and system alerts from TrueNAS.
+    inputs:
+      - type: cel
+        title: "Collect TrueNAS logs via the REST API"
+        description: "Collect audit records and system alerts from the TrueNAS REST API v2.0."
+        vars:
+          - name: url
+            type: url
+            title: TrueNAS URL
+            description: >-
+              Base URL of the TrueNAS system, including scheme and port, for example `https://truenas.example.com`. HTTPS is required: TrueNAS automatically revokes API keys that are sent over plain HTTP.
+            required: true
+            show_user: true
+            default: https://truenas.example.com
+          - name: api_key
+            type: password
+            title: API Key
+            description: >-
+              TrueNAS API key in `<id>-<secret>` form, for example `3-AbCd...`. Create it in the TrueNAS UI (24.x: Settings > API Keys, 25.04+: user menu > My API Keys) and link it to a user holding the Read-Only Administrator privilege. The leading numeric id must be included or authentication fails.
+            required: true
+            show_user: true
+            secret: true
+          - name: ssl
+            type: yaml
+            title: SSL Configuration
+            description: >-
+              SSL configuration options. **TrueNAS ships a self-signed certificate by default**, so leaving this empty fails with `x509: certificate signed by unknown authority`. Either set `verification_mode: none`, or supply the TrueNAS certificate authority with `certificate_authorities: ["/path/to/ca.crt"]`. See [documentation](https://www.elastic.co/guide/en/beats/filebeat/current/configuration-ssl.html#ssl-common-config).
+            required: false
+            show_user: true
+            multi: false
+          - name: proxy_url
+            type: url
+            title: Proxy URL
+            description: >-
+              URL to proxy connections in the form of `http[s]://<user>:<password>@<server name/ip>:<port>`.
+            required: false
+            show_user: false
+owner:
+  github: NateShoffner
+  type: community

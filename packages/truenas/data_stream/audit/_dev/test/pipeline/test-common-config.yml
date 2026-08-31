@@ -1,0 +1,7 @@
+fields:
+  "@timestamp": "2026-08-03T00:00:00.000Z"
+  tags:
+    - preserve_original_event
+numeric_keyword_fields:
+  - user.id
+  - group.id

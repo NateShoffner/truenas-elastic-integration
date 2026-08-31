@@ -1,0 +1,302 @@
+---
+description: Pipeline for parsing TrueNAS system alerts collected from `GET /api/v2.0/alert/list`.
+processors:
+  - set:
+      field: ecs.version
+      tag: set_ecs_version
+      value: '9.3.0'
+  - remove:
+      field:
+        - organization
+        - division
+        - team
+      ignore_missing: true
+      if: ctx.organization instanceof String && ctx.division instanceof String && ctx.team instanceof String
+      tag: remove_agentless_tags
+      description: >-
+        Removes the fields added by Agentless as metadata,
+        as they can collide with ECS fields.
+  - terminate:
+      tag: data_collection_error
+      if: ctx.error?.message != null && ctx.message == null && ctx.event?.original == null
+      description: error message set and no data to process.
+  - rename:
+      field: message
+      tag: rename_message_to_event_original
+      target_field: event.original
+      ignore_missing: true
+      description: Renames the original `message` field to `event.original` to store a copy of the original message. The `event.original` field is not touched if the document already has one; it may happen when Logstash sends the document.
+      if: ctx.event?.original == null
+  - remove:
+      field: message
+      tag: remove_message
+      ignore_missing: true
+      description: The `message` field is no longer required if the document has an `event.original` field.
+      if: ctx.event?.original != null
+
+  # Parsing
+  - json:
+      field: event.original
+      tag: parse_event_original
+      target_field: json
+      if: ctx.event?.original != null
+      description: Parses the single alert object carried in `event.original`.
+  - script:
+      lang: painless
+      tag: prune_null_values
+      description: >-
+        Recursively drops null values and the containers that become empty as a result. TrueNAS
+        returns every optional key of an alert explicitly as null, so `formatted`, `args` and `mail`
+        arrive as nulls rather than as absent keys. Pruning them up front lets every later processor
+        branch on presence instead of on presence-and-nullness.
+      if: ctx.json instanceof Map
+      source: |-
+        boolean prune(def o) {
+          if (o instanceof Map) {
+            def it = ((Map)o).entrySet().iterator();
+            while (it.hasNext()) {
+              if (prune(it.next().getValue())) {
+                it.remove();
+              }
+            }
+            return ((Map)o).isEmpty();
+          }
+          if (o instanceof List) {
+            def it = ((List)o).iterator();
+            while (it.hasNext()) {
+              if (prune(it.next())) {
+                it.remove();
+              }
+            }
+            return ((List)o).isEmpty();
+          }
+          return o == null;
+        }
+        prune(ctx.json);
+  - script:
+      lang: painless
+      tag: encode_polymorphic_fields_as_json
+      description: >-
+        Serialises `args` and `key` to a JSON string whenever they are not already strings. `args`
+        holds the class-specific arguments of an arbitrary alert class, so its JSON shape differs per
+        class: a bare string for `PoolUpgraded` and `ScrubFinished`, an object for `VolumeStatus`,
+        null for `NTPHealthCheck`, and a list for other classes. `key` is the dedup key TrueNAS
+        derives from those same arguments. No object mapping accepts every one of those shapes, so
+        both are stored as single strings that keep the full detail readable and cannot be rejected
+        at index time. Values that already are strings are left alone so the common case stays
+        readable rather than becoming a quoted JSON scalar. There is no built-in processor that
+        serialises a value to JSON.
+      if: ctx.json instanceof Map
+      source: |-
+        if (ctx.json.containsKey('args') && !(ctx.json.args instanceof String)) {
+          ctx.json.args = Json.dump(ctx.json.args);
+        }
+        if (ctx.json.containsKey('key') && !(ctx.json.key instanceof String)) {
+          ctx.json.key = Json.dump(ctx.json.key);
+        }
+
+  # Timestamps
+  - date:
+      field: json.last_occurrence.$date
+      tag: date_last_occurrence
+      target_field: '@timestamp'
+      formats:
+        - UNIX_MS
+      if: ctx.json?.last_occurrence != null
+      description: >-
+        The API returns the most recent occurrence of the alert as an Extended JSON `$date` wrapper
+        holding epoch milliseconds. An alert that recurs is re-collected, so the most recent
+        occurrence is the event time.
+  - date:
+      field: json.datetime.$date
+      tag: date_datetime
+      target_field: event.start
+      formats:
+        - UNIX_MS
+      if: ctx.json?.datetime != null
+      description: First occurrence of the alert, in the same Extended JSON `$date` wrapper.
+  - set:
+      field: '@timestamp'
+      tag: set_timestamp_from_event_start
+      copy_from: event.start
+      if: ctx.json?.last_occurrence == null && ctx.event?.start != null
+      description: Falls back to the first occurrence when the alert carries no last occurrence.
+
+  # Envelope
+  - rename:
+      field: json.uuid
+      tag: rename_uuid
+      target_field: event.id
+      ignore_missing: true
+  - remove:
+      field: json.id
+      tag: remove_redundant_id
+      ignore_missing: true
+      description: The API returns `id` as a second copy of `uuid`, which is already in `event.id`.
+  - rename:
+      field: json.klass
+      tag: rename_klass_to_event_action
+      target_field: event.action
+      ignore_missing: true
+      description: >-
+        The alert class name is the vendor verb of the event, for example `ScrubFinished`. It is kept
+        verbatim because it is the identifier TrueNAS documents its alert catalogue by.
+  - rename:
+      field: json.level
+      tag: rename_level_to_log_level
+      target_field: log.level
+      ignore_missing: true
+  - lowercase:
+      field: log.level
+      tag: lowercase_log_level
+      ignore_missing: true
+  - script:
+      lang: painless
+      tag: set_event_severity
+      description: >-
+        Maps the TrueNAS `AlertLevel` enum to a numeric severity. The enum names follow syslog, but
+        syslog numbers them in descending order of severity, which inverts the ECS convention that a
+        higher `event.severity` is more severe. The scale is therefore reversed: `info` 1, `notice` 2,
+        `warning` 3, `error` 4, `critical` 5, `alert` 6, `emergency` 7.
+      if: ctx.log?.level != null
+      params:
+        info: 1
+        notice: 2
+        warning: 3
+        error: 4
+        critical: 5
+        alert: 6
+        emergency: 7
+      source: |-
+        def severity = params[ctx.log.level];
+        if (severity == null) {
+          return;
+        }
+        ctx.event.severity = severity;
+
+  # Message
+  - rename:
+      field: json.formatted
+      tag: rename_formatted_to_message
+      target_field: message
+      ignore_missing: true
+      description: The alert text with its arguments already rendered in by TrueNAS.
+  - set:
+      field: message
+      tag: set_message_from_text
+      copy_from: json.text
+      ignore_empty_value: true
+      if: ctx.message == null
+      description: >-
+        Falls back to the unrendered template when the API returns `formatted` as null, which it does
+        for alert classes that do not implement a formatter.
+  - gsub:
+      field: message
+      tag: gsub_message_html_line_breaks
+      pattern: '<br\s*/?>'
+      replacement: "\n"
+      ignore_missing: true
+      description: >-
+        TrueNAS renders multi-line alert texts, such as the device list of a degraded pool, with HTML
+        line breaks. They are converted to real newlines so the message stays readable; the untouched
+        original remains available in `event.original`.
+
+  # Vendor fields
+  - rename:
+      field: json.text
+      tag: rename_text
+      target_field: truenas.alert.text
+      ignore_missing: true
+      description: >-
+        The unrendered template is kept alongside the rendered `message` because it is identical for
+        every occurrence of an alert class and is therefore what alerts aggregate by.
+  - rename:
+      field: json.source
+      tag: rename_source
+      target_field: truenas.alert.source
+      if: ctx.json?.source != null && ctx.json.source != ''
+      description: Most alert classes leave the generating source component empty.
+  - rename:
+      field: json.node
+      tag: rename_node
+      target_field: truenas.alert.node
+      ignore_missing: true
+  - rename:
+      field: json.key
+      tag: rename_key
+      target_field: truenas.alert.key
+      if: ctx.json?.key != null && ctx.json.key != ''
+      description: The JSON-encoded string TrueNAS deduplicates recurring alerts by.
+  - rename:
+      field: json.args
+      tag: rename_args
+      target_field: truenas.alert.args
+      ignore_missing: true
+      description: The class-specific arguments, normalised to a string by the preceding script.
+  - rename:
+      field: json.dismissed
+      tag: rename_dismissed
+      target_field: truenas.alert.dismissed
+      ignore_missing: true
+  - rename:
+      field: json.one_shot
+      tag: rename_one_shot
+      target_field: truenas.alert.one_shot
+      ignore_missing: true
+
+  # ECS categorization
+  - set:
+      field: event.kind
+      tag: set_event_kind
+      value: alert
+  - append:
+      field: event.category
+      tag: append_event_category
+      value: host
+      allow_duplicates: false
+  - append:
+      field: event.type
+      tag: append_event_type
+      value: info
+      allow_duplicates: false
+      description: >-
+        An alert reports a condition of the NAS rather than an action taken on it, so it carries no
+        success or failure semantics and `event.outcome` is left unset.
+
+  # Related fields
+  - append:
+      field: related.hosts
+      tag: append_node_to_related_hosts
+      value: '{{{truenas.alert.node}}}'
+      allow_duplicates: false
+      if: ctx.truenas?.alert?.node != null && !ctx.truenas.alert.node.startsWith('Controller ')
+      description: >-
+        `node` holds the host name on a single-controller system, but the failover label
+        `Controller A` or `Controller B` on an HA pair, which is not a host name.
+
+  # Cleanup
+  - remove:
+      field: json
+      tag: remove_json
+      ignore_missing: true
+  - append:
+      field: tags
+      tag: append_preserve_original_event_on_error
+      value: preserve_original_event
+      allow_duplicates: false
+      if: ctx.error?.message != null
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        Processor '{{{ _ingest.on_failure_processor_type }}}'
+        {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}'
+        {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'
+  - set:
+      field: event.kind
+      tag: set_pipeline_error_to_event_kind
+      value: pipeline_error
+  - append:
+      field: tags
+      value: preserve_original_event
+      allow_duplicates: false

@@ -1,0 +1,1407 @@
+{
+    "expected": [
+        {
+            "@timestamp": "2026-08-03T03:19:40.000Z",
+            "destination": {
+                "ip": "192.0.2.12",
+                "port": 445
+            },
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-authentication",
+                "category": [
+                    "authentication"
+                ],
+                "created": "2026-08-03T03:19:41.000Z",
+                "id": "b0d01d97-4790-53cb-8e14-40464f89d807",
+                "kind": "event",
+                "original": "{\"audit_id\":\"b0d01d97-4790-53cb-8e14-40464f89d807\",\"message_timestamp\":1785727181,\"timestamp\":{\"$date\":1785727180000},\"address\":\"192.0.2.11\",\"username\":\"bob\",\"session\":\"\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":null,\"session_id\":null,\"tcon_id\":null},\"event\":\"AUTHENTICATION\",\"event_data\":{\"logonId\":\"0\",\"logonType\":3,\"localAddress\":\"ipv4:192.0.2.12:445\",\"remoteAddress\":\"ipv4:192.0.2.11:50383\",\"serviceDescription\":\"SMB2\",\"authDescription\":null,\"clientDomain\":\"EXAMPLE\",\"clientAccount\":\"bob\",\"workstation\":\"WS01\",\"becameAccount\":\"bob\",\"becameDomain\":\"nas01\",\"becameSid\":\"S-1-5-21-1000000000-2000000000-3000000000-1100\",\"mappedAccount\":\"bob\",\"mappedDomain\":\"EXAMPLE\",\"netlogonComputer\":null,\"netlogonTrustAccount\":null,\"netlogonNegotiateFlags\":\"0x00000000\",\"netlogonSecureChannelType\":0,\"netlogonTrustAccountSid\":null,\"passwordType\":\"NTLMv2\",\"clientPolicyAccessCheck\":null,\"serverPolicyAccessCheck\":null,\"vers\":{\"major\":0,\"minor\":1},\"result\":{\"type\":\"NTSTATUS\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "start"
+                ]
+            },
+            "network": {
+                "protocol": "smb2"
+            },
+            "related": {
+                "hosts": [
+                    "WS01"
+                ],
+                "ip": [
+                    "192.0.2.11",
+                    "192.0.2.12"
+                ],
+                "user": [
+                    "bob"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.11",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.11",
+                "port": 50383
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "netlogonNegotiateFlags": "0x00000000",
+                        "netlogonSecureChannelType": 0
+                    },
+                    "logon": {
+                        "id": "0",
+                        "type": 3
+                    },
+                    "mapped": {
+                        "account": "bob",
+                        "domain": "EXAMPLE"
+                    },
+                    "password_type": "NTLMv2",
+                    "result": {
+                        "type": "NTSTATUS",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "workstation": "WS01"
+                }
+            },
+            "user": {
+                "domain": "EXAMPLE",
+                "effective": {
+                    "domain": "nas01",
+                    "id": "S-1-5-21-1000000000-2000000000-3000000000-1100",
+                    "name": "bob"
+                },
+                "name": "bob"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:30:00.123Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-create",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:30:00.000Z",
+                "id": "e2f2f4a0-6b6f-5f2e-9c1a-1b0d4c7e9a21",
+                "kind": "event",
+                "original": "{\"audit_id\":\"e2f2f4a0-6b6f-5f2e-9c1a-1b0d4c7e9a21\",\"message_timestamp\":1785771000,\"timestamp\":{\"$date\":1785771000123},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"CREATE\",\"event_data\":{\"parameters\":{\"DesiredAccess\":\"0x20089\",\"FileAttributes\":\"0x80\",\"ShareAccess\":\"0x7\",\"CreateDisposition\":\"OPEN_IF\",\"CreateOptions\":\"0x44\"},\"file_type\":\"REGULAR\",\"file\":{\"path\":\"/mnt/tank/projects/report.docx\",\"stream\":null,\"snap\":null,\"type\":\"REGULAR\",\"name\":\"report.docx\"},\"result\":{\"type\":\"NTSTATUS\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "creation"
+                ]
+            },
+            "file": {
+                "extension": "docx",
+                "name": "report.docx",
+                "path": "/mnt/tank/projects/report.docx",
+                "type": "file"
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "create_disposition": "OPEN_IF",
+                    "event_data": {
+                        "parameters": {
+                            "CreateOptions": "0x44",
+                            "DesiredAccess": "0x20089",
+                            "FileAttributes": "0x80",
+                            "ShareAccess": "0x7"
+                        }
+                    },
+                    "file_type": "REGULAR",
+                    "result": {
+                        "type": "NTSTATUS",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:31:40.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-authentication",
+                "category": [
+                    "authentication"
+                ],
+                "created": "2026-08-03T15:31:40.000Z",
+                "id": "0a3d5f92-4c18-5b7e-8d26-9f10b3c4e587",
+                "kind": "event",
+                "original": "{\"audit_id\":\"0a3d5f92-4c18-5b7e-8d26-9f10b3c4e587\",\"message_timestamp\":1785771100,\"timestamp\":{\"$date\":1785771100000},\"address\":\"192.0.2.21\",\"username\":\"bob\",\"session\":\"\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":null,\"session_id\":null,\"tcon_id\":null},\"event\":\"AUTHENTICATION\",\"event_data\":{\"logonId\":\"0\",\"logonType\":3,\"localAddress\":\"unknown\",\"remoteAddress\":\"unknown\",\"serviceDescription\":\"SMB2\",\"authDescription\":null,\"clientDomain\":\"EXAMPLE\",\"clientAccount\":\"bob\",\"workstation\":\"WS01\",\"becameAccount\":null,\"becameDomain\":null,\"becameSid\":null,\"mappedAccount\":null,\"mappedDomain\":null,\"netlogonComputer\":null,\"netlogonTrustAccount\":null,\"netlogonNegotiateFlags\":\"0x00000000\",\"netlogonSecureChannelType\":0,\"netlogonTrustAccountSid\":null,\"passwordType\":\"NTLMv2\",\"clientPolicyAccessCheck\":null,\"serverPolicyAccessCheck\":null,\"vers\":{\"major\":0,\"minor\":1},\"result\":{\"type\":\"NTSTATUS\",\"value_raw\":3221225581,\"value_parsed\":\"NT_STATUS_LOGON_FAILURE\"}},\"success\":false}",
+                "outcome": "failure",
+                "provider": "SMB",
+                "reason": "NT_STATUS_LOGON_FAILURE",
+                "type": [
+                    "start"
+                ]
+            },
+            "network": {
+                "protocol": "smb2"
+            },
+            "related": {
+                "hosts": [
+                    "WS01"
+                ],
+                "ip": [
+                    "192.0.2.21"
+                ],
+                "user": [
+                    "bob"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.21",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.21"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "localAddress": "unknown",
+                        "netlogonNegotiateFlags": "0x00000000",
+                        "netlogonSecureChannelType": 0,
+                        "remoteAddress": "unknown"
+                    },
+                    "logon": {
+                        "id": "0",
+                        "type": 3
+                    },
+                    "password_type": "NTLMv2",
+                    "result": {
+                        "type": "NTSTATUS",
+                        "value_parsed": "NT_STATUS_LOGON_FAILURE",
+                        "value_raw": 3221225581
+                    },
+                    "workstation": "WS01"
+                }
+            },
+            "user": {
+                "domain": "EXAMPLE",
+                "name": "bob"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:33:20.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-connect",
+                "category": [
+                    "session"
+                ],
+                "created": "2026-08-03T15:33:20.000Z",
+                "id": "3b8c0e47-9d51-5a26-b73f-4c81e2f6a09d",
+                "kind": "event",
+                "original": "{\"audit_id\":\"3b8c0e47-9d51-5a26-b73f-4c81e2f6a09d\",\"message_timestamp\":1785771200,\"timestamp\":{\"$date\":1785771200000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"CONNECT\",\"event_data\":{\"host\":\"ipv4:192.0.2.20:50384\",\"unix_token\":{\"uid\":3000,\"gid\":3000,\"groups\":[544,545]},\"result\":{\"type\":\"UNIX\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "start"
+                ]
+            },
+            "group": {
+                "id": 3000
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "host": "ipv4:192.0.2.20:50384",
+                        "unix_token": {
+                            "groups": [
+                                544,
+                                545
+                            ]
+                        }
+                    },
+                    "result": {
+                        "type": "UNIX",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "id": 3000,
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:35:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-disconnect",
+                "category": [
+                    "session"
+                ],
+                "created": "2026-08-03T15:35:00.000Z",
+                "id": "6e2f4a81-0b93-5c17-84d5-2a76f0c9b3e4",
+                "kind": "event",
+                "original": "{\"audit_id\":\"6e2f4a81-0b93-5c17-84d5-2a76f0c9b3e4\",\"message_timestamp\":1785771300,\"timestamp\":{\"$date\":1785771300000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"DISCONNECT\",\"event_data\":{\"host\":\"ipv4:192.0.2.20:50384\",\"unix_token\":{\"uid\":3000,\"gid\":3000,\"groups\":[544,545]},\"operations\":{\"create\":\"12\",\"close\":\"11\",\"read\":\"340\",\"write\":\"27\"},\"result\":{\"type\":\"UNIX\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "end"
+                ]
+            },
+            "group": {
+                "id": 3000
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "host": "ipv4:192.0.2.20:50384",
+                        "unix_token": {
+                            "groups": [
+                                544,
+                                545
+                            ]
+                        }
+                    },
+                    "operations": {
+                        "close": 11,
+                        "create": 12,
+                        "read": 340,
+                        "write": 27
+                    },
+                    "result": {
+                        "type": "UNIX",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "id": 3000,
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:36:40.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-create",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:36:40.000Z",
+                "id": "8d4a1c60-2e75-5f39-9b48-1c05d7e3a2f6",
+                "kind": "event",
+                "original": "{\"audit_id\":\"8d4a1c60-2e75-5f39-9b48-1c05d7e3a2f6\",\"message_timestamp\":1785771400,\"timestamp\":{\"$date\":1785771400000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"CREATE\",\"event_data\":{\"parameters\":{\"DesiredAccess\":\"0x100081\",\"FileAttributes\":\"0x0\",\"ShareAccess\":\"0x7\",\"CreateDisposition\":\"OPEN\",\"CreateOptions\":\"0x21\"},\"file_type\":\"DIRECTORY\",\"file\":{\"path\":\"/mnt/tank/projects/reports\",\"stream\":null,\"snap\":null,\"type\":\"DIRECTORY\",\"name\":\"reports\"},\"result\":{\"type\":\"NTSTATUS\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "access"
+                ]
+            },
+            "file": {
+                "name": "reports",
+                "path": "/mnt/tank/projects/reports",
+                "type": "dir"
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "create_disposition": "OPEN",
+                    "event_data": {
+                        "parameters": {
+                            "CreateOptions": "0x21",
+                            "DesiredAccess": "0x100081",
+                            "FileAttributes": "0x0",
+                            "ShareAccess": "0x7"
+                        }
+                    },
+                    "file_type": "DIRECTORY",
+                    "result": {
+                        "type": "NTSTATUS",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:38:20.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-close",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:38:20.000Z",
+                "id": "1f7b3d58-6a04-5e92-8c31-5d29b4f0e7a1",
+                "kind": "event",
+                "original": "{\"audit_id\":\"1f7b3d58-6a04-5e92-8c31-5d29b4f0e7a1\",\"message_timestamp\":1785771500,\"timestamp\":{\"$date\":1785771500000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"CLOSE\",\"event_data\":{\"file\":{\"handle\":{\"type\":\"DEV_INO\",\"value\":\"1234:56789:0\"}},\"operations\":{\"read_cnt\":\"8\",\"read_bytes\":\"262144\",\"write_cnt\":\"3\",\"write_bytes\":\"98304\"},\"result\":{\"type\":\"UNIX\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "access"
+                ]
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "file": {
+                            "handle": {
+                                "type": "DEV_INO",
+                                "value": "1234:56789:0"
+                            }
+                        }
+                    },
+                    "operations": {
+                        "read_bytes": 262144,
+                        "read_cnt": 8,
+                        "write_bytes": 98304,
+                        "write_cnt": 3
+                    },
+                    "result": {
+                        "type": "UNIX",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:40:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-read",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:40:00.000Z",
+                "id": "4c9e6b12-8f30-5d47-a25b-7e18c3a0f592",
+                "kind": "event",
+                "original": "{\"audit_id\":\"4c9e6b12-8f30-5d47-a25b-7e18c3a0f592\",\"message_timestamp\":1785771600,\"timestamp\":{\"$date\":1785771600000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"READ\",\"event_data\":{\"file\":{\"handle\":{\"type\":\"DEV_INO\",\"value\":\"1234:56789:0\"}},\"result\":{\"type\":\"UNIX\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "access"
+                ]
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "file": {
+                            "handle": {
+                                "type": "DEV_INO",
+                                "value": "1234:56789:0"
+                            }
+                        }
+                    },
+                    "result": {
+                        "type": "UNIX",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:41:40.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-write",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:41:40.000Z",
+                "id": "9a1d7f34-5c62-5b08-91e7-3f40d8b2c6a5",
+                "kind": "event",
+                "original": "{\"audit_id\":\"9a1d7f34-5c62-5b08-91e7-3f40d8b2c6a5\",\"message_timestamp\":1785771700,\"timestamp\":{\"$date\":1785771700000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"WRITE\",\"event_data\":{\"file\":{\"handle\":{\"type\":\"DEV_INO\",\"value\":\"1234:56789:0\"}},\"result\":{\"type\":\"UNIX\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "change"
+                ]
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "file": {
+                            "handle": {
+                                "type": "DEV_INO",
+                                "value": "1234:56789:0"
+                            }
+                        }
+                    },
+                    "result": {
+                        "type": "UNIX",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:43:20.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-offload-read",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:43:20.000Z",
+                "id": "5e30c8a6-1b47-5f92-8d14-6a29e7f0b381",
+                "kind": "event",
+                "original": "{\"audit_id\":\"5e30c8a6-1b47-5f92-8d14-6a29e7f0b381\",\"message_timestamp\":1785771800,\"timestamp\":{\"$date\":1785771800000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"OFFLOAD_READ\",\"event_data\":{\"file\":{\"handle\":{\"type\":\"DEV_INO\",\"value\":\"1234:56789:0\"}},\"result\":{\"type\":\"NTSTATUS\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "access"
+                ]
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "file": {
+                            "handle": {
+                                "type": "DEV_INO",
+                                "value": "1234:56789:0"
+                            }
+                        }
+                    },
+                    "result": {
+                        "type": "NTSTATUS",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:45:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-offload-write",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:45:00.000Z",
+                "id": "7b62f019-3d85-5a41-9c06-8e14a5d2f739",
+                "kind": "event",
+                "original": "{\"audit_id\":\"7b62f019-3d85-5a41-9c06-8e14a5d2f739\",\"message_timestamp\":1785771900,\"timestamp\":{\"$date\":1785771900000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"OFFLOAD_WRITE\",\"event_data\":{\"file\":{\"handle\":{\"type\":\"DEV_INO\",\"value\":\"1234:56789:0\"}},\"result\":{\"type\":\"NTSTATUS\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "change"
+                ]
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "file": {
+                            "handle": {
+                                "type": "DEV_INO",
+                                "value": "1234:56789:0"
+                            }
+                        }
+                    },
+                    "result": {
+                        "type": "NTSTATUS",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:46:40.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-set-attr",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:46:40.000Z",
+                "id": "2f48a0d7-6e13-5c85-b940-1d73f6c9e208",
+                "kind": "event",
+                "original": "{\"audit_id\":\"2f48a0d7-6e13-5c85-b940-1d73f6c9e208\",\"message_timestamp\":1785772000,\"timestamp\":{\"$date\":1785772000000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"SET_ATTR\",\"event_data\":{\"attr_type\":\"DOSMODE\",\"dosmode\":\"0x20\",\"ts\":null,\"file\":{\"handle\":{\"type\":\"DEV_INO\",\"value\":\"1234:56789:0\"}},\"result\":{\"type\":\"UNIX\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "change"
+                ]
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "attr_type": "DOSMODE",
+                        "dosmode": "0x20",
+                        "file": {
+                            "handle": {
+                                "type": "DEV_INO",
+                                "value": "1234:56789:0"
+                            }
+                        }
+                    },
+                    "result": {
+                        "type": "UNIX",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:48:20.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-set-acl",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:48:20.000Z",
+                "id": "6d19b4e2-7a50-5f36-8b27-4c05e9a1d7f3",
+                "kind": "event",
+                "original": "{\"audit_id\":\"6d19b4e2-7a50-5f36-8b27-4c05e9a1d7f3\",\"message_timestamp\":1785772100,\"timestamp\":{\"$date\":1785772100000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"SET_ACL\",\"event_data\":{\"file\":{\"path\":\"/mnt/tank/projects/latest.lnk\",\"stream\":null,\"snap\":null,\"type\":\"SYMLINK\",\"name\":\"latest.lnk\"},\"secinfo\":\"0x00000004\",\"sd\":\"O:S-1-5-21-1000000000-2000000000-3000000000-1100G:S-1-22-2-3000D:(A;;0x001f01ff;;;S-1-22-1-3000)\",\"result\":{\"type\":\"NTSTATUS\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "change"
+                ]
+            },
+            "file": {
+                "extension": "lnk",
+                "name": "latest.lnk",
+                "path": "/mnt/tank/projects/latest.lnk",
+                "type": "symlink"
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "sd": "O:S-1-5-21-1000000000-2000000000-3000000000-1100G:S-1-22-2-3000D:(A;;0x001f01ff;;;S-1-22-1-3000)",
+                        "secinfo": "0x00000004"
+                    },
+                    "file_type": "SYMLINK",
+                    "result": {
+                        "type": "NTSTATUS",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:50:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-set-quota",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:50:00.000Z",
+                "id": "3a75e6c8-9b21-5d40-8f63-2e17b0d4a9c5",
+                "kind": "event",
+                "original": "{\"audit_id\":\"3a75e6c8-9b21-5d40-8f63-2e17b0d4a9c5\",\"message_timestamp\":1785772200,\"timestamp\":{\"$date\":1785772200000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"SET_QUOTA\",\"event_data\":{\"qt\":{\"type\":\"USER\",\"bsize\":1024,\"soflimit\":0,\"hardlimit\":10737418240,\"isoftlimit\":0,\"ihardlimit\":0},\"result\":{\"type\":\"UNIX\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "change"
+                ]
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "qt": {
+                            "bsize": 1024,
+                            "hardlimit": 10737418240,
+                            "ihardlimit": 0,
+                            "isoftlimit": 0,
+                            "soflimit": 0,
+                            "type": "USER"
+                        }
+                    },
+                    "result": {
+                        "type": "UNIX",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:51:40.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-fsctl",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:51:40.000Z",
+                "id": "8c04d3b7-2f96-5a18-b45e-7d31c6f0e2a9",
+                "kind": "event",
+                "original": "{\"audit_id\":\"8c04d3b7-2f96-5a18-b45e-7d31c6f0e2a9\",\"message_timestamp\":1785772300,\"timestamp\":{\"$date\":1785772300000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"FSCTL\",\"event_data\":{\"function\":{\"raw\":\"0x000900a4\",\"parsed\":\"FSCTL_SET_ZERO_DATA\"},\"file\":{\"handle\":{\"type\":\"DEV_INO\",\"value\":\"1234:56789:0\"}},\"result\":{\"type\":\"NTSTATUS\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "change"
+                ]
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "event_data": {
+                        "file": {
+                            "handle": {
+                                "type": "DEV_INO",
+                                "value": "1234:56789:0"
+                            }
+                        },
+                        "function": {
+                            "parsed": "FSCTL_SET_ZERO_DATA",
+                            "raw": "0x000900a4"
+                        }
+                    },
+                    "result": {
+                        "type": "NTSTATUS",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:53:20.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-rename",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:53:20.000Z",
+                "id": "5b81f2a4-0c67-5e39-9d28-6f14a3b0c7e5",
+                "kind": "event",
+                "original": "{\"audit_id\":\"5b81f2a4-0c67-5e39-9d28-6f14a3b0c7e5\",\"message_timestamp\":1785772400,\"timestamp\":{\"$date\":1785772400000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"RENAME\",\"event_data\":{\"src_file\":{\"path\":\"/mnt/tank/projects/draft.docx\",\"stream\":null,\"snap\":null,\"file_type\":\"REGULAR\"},\"dst_file\":{\"path\":\"/mnt/tank/projects/final.docx\",\"stream\":null,\"snap\":null},\"result\":{\"type\":\"UNIX\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "change"
+                ]
+            },
+            "file": {
+                "extension": "docx",
+                "name": "draft.docx",
+                "path": "/mnt/tank/projects/draft.docx",
+                "type": "file"
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "dst_file": {
+                        "path": "/mnt/tank/projects/final.docx"
+                    },
+                    "file_type": "REGULAR",
+                    "result": {
+                        "type": "UNIX",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T15:55:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "smb-unlink",
+                "category": [
+                    "file"
+                ],
+                "created": "2026-08-03T15:55:00.000Z",
+                "id": "0e57c1f9-4a83-5b26-8d70-3b19e2a5f048",
+                "kind": "event",
+                "original": "{\"audit_id\":\"0e57c1f9-4a83-5b26-8d70-3b19e2a5f048\",\"message_timestamp\":1785772500,\"timestamp\":{\"$date\":1785772500000},\"address\":\"192.0.2.20\",\"username\":\"alice\",\"session\":\"b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d\",\"service\":\"SMB\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1},\"service\":\"projects\",\"session_id\":\"1234567890\",\"tcon_id\":\"987654321\"},\"event\":\"UNLINK\",\"event_data\":{\"file\":{\"path\":\"/mnt/tank/projects/old.tmp\",\"stream\":null,\"snap\":null,\"type\":\"REGULAR\",\"name\":\"old.tmp\"},\"result\":{\"type\":\"UNIX\",\"value_raw\":0,\"value_parsed\":\"SUCCESS\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SMB",
+                "type": [
+                    "deletion"
+                ]
+            },
+            "file": {
+                "extension": "tmp",
+                "name": "old.tmp",
+                "path": "/mnt/tank/projects/old.tmp",
+                "type": "file"
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.20"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.20",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.20"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "file_type": "REGULAR",
+                    "result": {
+                        "type": "UNIX",
+                        "value_parsed": "SUCCESS",
+                        "value_raw": 0
+                    },
+                    "session": "b1a2c3d4-5e6f-5a7b-8c9d-0e1f2a3b4c5d",
+                    "session_id": "1234567890",
+                    "share": "projects",
+                    "tcon_id": "987654321"
+                }
+            },
+            "user": {
+                "name": "alice"
+            }
+        }
+    ]
+}

@@ -1,0 +1,74 @@
+---
+description: Pipeline for parsing TrueNAS SYSTEM (auditd backed) audit records.
+processors:
+  - rename:
+      field: json.event_data.proctitle
+      tag: rename_proctitle
+      target_field: process.title
+      ignore_missing: true
+  - rename:
+      field: json.event_data.cwd
+      tag: rename_cwd
+      target_field: process.working_directory
+      ignore_missing: true
+  - rename:
+      field: json.event_data.syscall.SYSCALL
+      tag: rename_syscall_name
+      target_field: truenas.audit.syscall.name
+      ignore_missing: true
+  - rename:
+      field: json.event_data.syscall.tty
+      tag: rename_syscall_tty
+      target_field: truenas.audit.syscall.tty
+      ignore_missing: true
+  - rename:
+      field: json.event_data.syscall.uid
+      tag: rename_syscall_uid
+      target_field: user.id
+      ignore_missing: true
+  - rename:
+      field: json.event_data.syscall.UID
+      tag: rename_syscall_user_name
+      target_field: user.name
+      ignore_missing: true
+      if: ctx.user?.name == null
+  - remove:
+      field: json.event_data.syscall.UID
+      tag: remove_syscall_user_name
+      ignore_missing: true
+  - rename:
+      field: json.event_data.syscall.gid
+      tag: rename_syscall_gid
+      target_field: group.id
+      ignore_missing: true
+  - rename:
+      field: json.event_data.syscall.GID
+      tag: rename_syscall_group_name
+      target_field: group.name
+      ignore_missing: true
+  - rename:
+      field: json.event_data.syscall.auid
+      tag: rename_syscall_auid
+      target_field: truenas.audit.syscall.auid
+      ignore_missing: true
+      description: Linux audit login uid; the identity the session was originally authenticated as.
+  - rename:
+      field: json.event_data.syscall.AUID
+      tag: rename_syscall_audit_user
+      target_field: truenas.audit.syscall.audit_user
+      ignore_missing: true
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        Processor '{{{ _ingest.on_failure_processor_type }}}'
+        {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}'
+        {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'
+  - set:
+      field: event.kind
+      tag: set_pipeline_error_to_event_kind
+      value: pipeline_error
+  - append:
+      field: tags
+      value: preserve_original_event
+      allow_duplicates: false

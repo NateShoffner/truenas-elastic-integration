@@ -1,0 +1,16 @@
+{
+    "events": [
+        {
+            "message": "{\"uuid\": \"fc27041b-43a2-50fa-9f53-2bdcfbab64b7\", \"source\": \"\", \"klass\": \"PoolUpgraded\", \"args\": \"nas01\", \"node\": \"nas01\", \"key\": \"\\\"nas01\\\"\", \"datetime\": {\"$date\": 1784428572000}, \"last_occurrence\": {\"$date\": 1784428572000}, \"dismissed\": true, \"mail\": null, \"text\": \"New ZFS version or feature flags are available for pool '%s'. Upgrading pools is a one-time process that can prevent rolling the system back to an earlier TrueNAS version. It is recommended to read the TrueNAS release notes and confirm you need the new ZFS feature flags before upgrading a pool.\", \"id\": \"fc27041b-43a2-50fa-9f53-2bdcfbab64b7\", \"level\": \"NOTICE\", \"formatted\": \"New ZFS version or feature flags are available for pool 'nas01'. Upgrading pools is a one-time process that can prevent rolling the system back to an earlier TrueNAS version. It is recommended to read the TrueNAS release notes and confirm you need the new ZFS feature flags before upgrading a pool.\", \"one_shot\": false}"
+        },
+        {
+            "message": "{\"uuid\": \"3147381a-e4c1-5c5d-b591-8add87f0e6c5\", \"source\": \"\", \"klass\": \"ScrubFinished\", \"args\": \"freenas-boot\", \"node\": \"nas01\", \"key\": \"\\\"freenas-boot\\\"\", \"datetime\": {\"$date\": 1785743385000}, \"last_occurrence\": {\"$date\": 1785743385000}, \"dismissed\": false, \"mail\": null, \"text\": \"Scrub of pool %r finished.\", \"id\": \"3147381a-e4c1-5c5d-b591-8add87f0e6c5\", \"level\": \"INFO\", \"formatted\": \"Scrub of pool 'freenas-boot' finished.\", \"one_shot\": true}"
+        },
+        {
+            "message": "{\"uuid\": \"28ccab3f-1002-5b9e-9fa4-693f70cca2d5\", \"source\": \"\", \"klass\": \"ScrubStarted\", \"args\": \"freenas-boot\", \"node\": \"nas01\", \"key\": \"\\\"freenas-boot\\\"\", \"datetime\": {\"$date\": 1785743101000}, \"last_occurrence\": {\"$date\": 1785746400000}, \"dismissed\": false, \"mail\": null, \"text\": \"Scrub of pool %r started.\", \"id\": \"28ccab3f-1002-5b9e-9fa4-693f70cca2d5\", \"level\": \"INFO\", \"formatted\": \"Scrub of pool 'freenas-boot' started.\", \"one_shot\": true}"
+        },
+        {
+            "message": "{\"uuid\": \"7b6a5c4d-3e2f-51a0-9b8c-7d6e5f4a3b2c\", \"source\": \"\", \"klass\": \"VolumeStatus\", \"args\": {\"volume\": \"tank\", \"state\": \"DEGRADED\", \"devices\": \"<br>raidz1-0<br>  sda  FAULTED  too many errors\"}, \"node\": \"nas01\", \"key\": \"{\\\"volume\\\": \\\"tank\\\"}\", \"datetime\": {\"$date\": 1785747000000}, \"last_occurrence\": {\"$date\": 1785747000000}, \"dismissed\": false, \"mail\": null, \"text\": \"Pool %(volume)s state is %(state)s: %(status)s\", \"id\": \"7b6a5c4d-3e2f-51a0-9b8c-7d6e5f4a3b2c\", \"level\": \"CRITICAL\", \"formatted\": \"Pool tank state is DEGRADED: One or more devices are faulted in response to persistent errors.<br>The following devices are not healthy:<br>raidz1-0<br>  sda  FAULTED  too many errors\", \"one_shot\": false}"
+        }
+    ]
+}

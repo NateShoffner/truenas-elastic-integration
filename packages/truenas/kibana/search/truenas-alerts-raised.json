@@ -1,0 +1,44 @@
+{
+    "attributes": {
+        "columns": [
+            "log.level",
+            "event.action",
+            "message",
+            "truenas.alert.node",
+            "event.start"
+        ],
+        "description": "TrueNAS system health alerts, most recent occurrence first. TrueNAS only reports an alert when it is raised or when it recurs, so this is not a list of the alerts that are currently active.",
+        "grid": {},
+        "hideChart": false,
+        "isTextBasedQuery": false,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "data_stream.dataset: \"truenas.alert\""
+                }
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "timeRestore": false,
+        "title": "Alerts raised [Logs TrueNAS]"
+    },
+    "coreMigrationVersion": "8.8.0",
+    "id": "truenas-alerts-raised",
+    "references": [
+        {
+            "id": "logs-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "typeMigrationVersion": "10.12.0"
+}

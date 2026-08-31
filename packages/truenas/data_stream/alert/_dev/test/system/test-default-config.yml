@@ -1,0 +1,20 @@
+wait_for_data_timeout: 1m
+input: cel
+service: truenas-alert-mock
+vars:
+  url: http://{{Hostname}}:{{Port}}
+  api_key: 1-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+data_stream:
+  vars:
+    interval: 2s
+assert:
+  # /alert/list is a full snapshot with no pagination, so each poll is a single
+  # request. Round 1 returns three alerts and, with no cursor yet, emits all
+  # three, persisting the high-water mark 1785743385000. Round 2 returns five
+  # alerts, of which three are newer than that mark (one recurrence plus two
+  # new alerts), and advances the mark to 1785747000000. Every later round
+  # replays the same five-alert snapshot, none of it newer than the persisted
+  # mark, so the count stays fixed for the rest of the run. If the high-water
+  # mark were ever lost, those rounds would re-emit up to five alerts every 2s
+  # and the count would exceed this value.
+  hit_count: 6

@@ -1,0 +1,305 @@
+{
+    "expected": [
+        {
+            "@timestamp": "2026-08-03T18:00:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "system-login",
+                "category": [
+                    "authentication"
+                ],
+                "created": "2026-08-03T18:00:00.000Z",
+                "id": "7f3c9e21-5a48-5d6b-9c02-4e18b7d3a960",
+                "kind": "event",
+                "original": "{\"audit_id\":\"7f3c9e21-5a48-5d6b-9c02-4e18b7d3a960\",\"message_timestamp\":1785780000,\"timestamp\":{\"$date\":1785780000000},\"address\":\"192.0.2.30\",\"username\":\"alice\",\"session\":null,\"service\":\"SYSTEM\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1}},\"event\":\"LOGIN\",\"event_data\":{\"proctitle\":\"/usr/bin/login\",\"syscall\":{\"tty\":\"pts/0\",\"SYSCALL\":\"execve\",\"auid\":3000,\"AUID\":\"alice\",\"uid\":3000,\"UID\":\"alice\",\"gid\":3000,\"GID\":\"alice\"},\"vers\":{\"major\":0,\"minor\":1}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SYSTEM",
+                "type": [
+                    "start"
+                ]
+            },
+            "group": {
+                "id": 3000,
+                "name": "alice"
+            },
+            "process": {
+                "title": "/usr/bin/login"
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.30"
+                ],
+                "user": [
+                    "alice"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.30",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.30"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "syscall": {
+                        "audit_user": "alice",
+                        "auid": 3000,
+                        "name": "execve",
+                        "tty": "pts/0"
+                    }
+                }
+            },
+            "user": {
+                "id": 3000,
+                "name": "alice"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T18:02:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "system-privileged",
+                "category": [
+                    "process"
+                ],
+                "created": "2026-08-03T18:02:00.000Z",
+                "id": "2c6b8f04-71d9-5e33-b845-9a07c1e6f2d8",
+                "kind": "event",
+                "original": "{\"audit_id\":\"2c6b8f04-71d9-5e33-b845-9a07c1e6f2d8\",\"message_timestamp\":1785780120,\"timestamp\":{\"$date\":1785780120000},\"address\":\"192.0.2.30\",\"username\":\"root\",\"session\":null,\"service\":\"SYSTEM\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1}},\"event\":\"PRIVILEGED\",\"event_data\":{\"proctitle\":\"/usr/sbin/zfs snapshot tank/projects@daily\",\"cwd\":\"/root\",\"syscall\":{\"tty\":\"pts/1\",\"SYSCALL\":\"execve\",\"auid\":0,\"AUID\":\"root\",\"uid\":0,\"UID\":\"root\",\"gid\":0,\"GID\":\"root\"}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SYSTEM",
+                "type": [
+                    "start"
+                ]
+            },
+            "group": {
+                "id": 0,
+                "name": "root"
+            },
+            "process": {
+                "title": "/usr/sbin/zfs snapshot tank/projects@daily",
+                "working_directory": "/root"
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.30"
+                ],
+                "user": [
+                    "root"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.30",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.30"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "syscall": {
+                        "audit_user": "root",
+                        "auid": 0,
+                        "name": "execve",
+                        "tty": "pts/1"
+                    }
+                }
+            },
+            "user": {
+                "id": 0,
+                "name": "root"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T18:04:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "system-escalation",
+                "category": [
+                    "process"
+                ],
+                "created": "2026-08-03T18:04:00.000Z",
+                "id": "b4157ae9-3f62-5c80-91d4-6e2b0d8a7c53",
+                "kind": "event",
+                "original": "{\"audit_id\":\"b4157ae9-3f62-5c80-91d4-6e2b0d8a7c53\",\"message_timestamp\":1785780240,\"timestamp\":{\"$date\":1785780240000},\"address\":\"192.0.2.31\",\"username\":\"\",\"session\":null,\"service\":\"SYSTEM\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1}},\"event\":\"ESCALATION\",\"event_data\":{\"proctitle\":\"/usr/bin/sudo -i\",\"cwd\":\"/home/bob\",\"syscall\":{\"tty\":\"pts/2\",\"SYSCALL\":\"setresuid\",\"auid\":3001,\"AUID\":\"bob\",\"uid\":0,\"UID\":\"root\",\"gid\":0,\"GID\":\"root\"}},\"success\":true}",
+                "outcome": "success",
+                "provider": "SYSTEM",
+                "type": [
+                    "start"
+                ]
+            },
+            "group": {
+                "id": 0,
+                "name": "root"
+            },
+            "process": {
+                "title": "/usr/bin/sudo -i",
+                "working_directory": "/home/bob"
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.31"
+                ],
+                "user": [
+                    "root"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.31",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.31"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "syscall": {
+                        "audit_user": "bob",
+                        "auid": 3001,
+                        "name": "setresuid",
+                        "tty": "pts/2"
+                    }
+                }
+            },
+            "user": {
+                "id": 0,
+                "name": "root"
+            }
+        },
+        {
+            "@timestamp": "2026-08-03T18:06:00.000Z",
+            "ecs": {
+                "version": "9.3.0"
+            },
+            "event": {
+                "action": "system-login",
+                "category": [
+                    "authentication"
+                ],
+                "created": "2026-08-03T18:06:00.000Z",
+                "id": "d9e0f1a2-8b73-5f45-a2c6-7d3e5b90c184",
+                "kind": "event",
+                "original": "{\"audit_id\":\"d9e0f1a2-8b73-5f45-a2c6-7d3e5b90c184\",\"message_timestamp\":1785780360,\"timestamp\":{\"$date\":1785780360000},\"address\":\"192.0.2.32\",\"username\":\"bob\",\"session\":null,\"service\":\"SYSTEM\",\"service_data\":{\"vers\":{\"major\":0,\"minor\":1}},\"event\":\"LOGIN\",\"event_data\":{\"proctitle\":\"/usr/sbin/sshd\",\"syscall\":{\"tty\":null,\"SYSCALL\":\"execve\",\"auid\":4294967295,\"AUID\":\"unset\",\"uid\":0,\"UID\":\"root\",\"gid\":0,\"GID\":\"root\"}},\"success\":false}",
+                "outcome": "failure",
+                "provider": "SYSTEM",
+                "type": [
+                    "start"
+                ]
+            },
+            "group": {
+                "id": 0,
+                "name": "root"
+            },
+            "process": {
+                "title": "/usr/sbin/sshd"
+            },
+            "related": {
+                "ip": [
+                    "192.0.2.32"
+                ],
+                "user": [
+                    "bob"
+                ]
+            },
+            "source": {
+                "address": "192.0.2.32",
+                "as": {
+                    "number": 64500,
+                    "organization": {
+                        "name": "Documentation ASN"
+                    }
+                },
+                "geo": {
+                    "city_name": "Las Vegas",
+                    "continent_name": "North America",
+                    "country_iso_code": "US",
+                    "country_name": "United States",
+                    "location": {
+                        "lat": 36.17497,
+                        "lon": -115.13722
+                    },
+                    "region_iso_code": "US-NV",
+                    "region_name": "Nevada"
+                },
+                "ip": "192.0.2.32"
+            },
+            "tags": [
+                "preserve_original_event"
+            ],
+            "truenas": {
+                "audit": {
+                    "syscall": {
+                        "audit_user": "unset",
+                        "auid": 4294967295,
+                        "name": "execve"
+                    }
+                }
+            },
+            "user": {
+                "id": 0,
+                "name": "bob"
+            }
+        }
+    ]
+}

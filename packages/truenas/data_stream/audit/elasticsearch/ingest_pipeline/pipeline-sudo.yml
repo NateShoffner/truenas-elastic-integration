@@ -1,0 +1,111 @@
+---
+description: Pipeline for parsing TrueNAS SUDO audit records.
+processors:
+  - rename:
+      field: json.event_data.sudo.accept
+      tag: rename_sudo_accept
+      target_field: json.sudo
+      ignore_missing: true
+      description: sudo nests its native JSON audit payload under the outcome it recorded.
+  - rename:
+      field: json.event_data.sudo.reject
+      tag: rename_sudo_reject
+      target_field: json.sudo
+      ignore_missing: true
+      if: ctx.json?.sudo == null
+  - rename:
+      field: json.sudo.command
+      tag: rename_sudo_command
+      target_field: process.command_line
+      ignore_missing: true
+  - grok:
+      field: process.command_line
+      tag: grok_process_name
+      patterns:
+        - '^.*/(?<process.name>[^/]+)$'
+      if: ctx.process?.command_line != null && ctx.process.command_line.contains('/')
+  - rename:
+      field: json.sudo.runargv
+      tag: rename_sudo_runargv
+      target_field: process.args
+      ignore_missing: true
+      description: sudo serialises the argument vector as a comma separated list with quoted elements.
+  - split:
+      field: process.args
+      tag: split_process_args
+      separator: ','
+      if: ctx.process?.args instanceof String
+  - foreach:
+      field: process.args
+      tag: foreach_strip_process_args_quotes
+      if: ctx.process?.args instanceof List
+      processor:
+        gsub:
+          field: _ingest._value
+          tag: gsub_process_arg_quotes
+          pattern: '^"|"$'
+          replacement: ''
+  - script:
+      lang: painless
+      tag: set_process_args_count
+      description: Records the length of the sudo argument vector.
+      if: ctx.process?.args instanceof List
+      source: |-
+        ctx.process.args_count = ctx.process.args.size();
+  - rename:
+      field: json.sudo.runuser
+      tag: rename_sudo_runuser
+      target_field: user.effective.name
+      ignore_missing: true
+  - rename:
+      field: json.sudo.runuid
+      tag: rename_sudo_runuid
+      target_field: user.effective.id
+      ignore_missing: true
+  - rename:
+      field: json.sudo.submituser
+      tag: rename_sudo_submituser
+      target_field: user.name
+      ignore_missing: true
+      if: ctx.user?.name == null
+  - remove:
+      field: json.sudo.submituser
+      tag: remove_sudo_submituser
+      ignore_missing: true
+  - rename:
+      field: json.sudo.submitcwd
+      tag: rename_sudo_submitcwd
+      target_field: process.working_directory
+      ignore_missing: true
+  - append:
+      field: related.hosts
+      tag: append_sudo_submithost_to_related_hosts
+      value: '{{{json.sudo.submithost}}}'
+      allow_duplicates: false
+      if: ctx.json?.sudo?.submithost != null
+  - remove:
+      field: json.event_data
+      tag: remove_drained_event_data
+      ignore_missing: true
+      description: Only the emptied `sudo` wrapper is left at this point.
+  - rename:
+      field: json.sudo
+      tag: rename_sudo_remainder_to_event_data
+      target_field: json.event_data
+      ignore_missing: true
+      description: The remaining sudo payload is carried by the shared flattened `event_data` object.
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        Processor '{{{ _ingest.on_failure_processor_type }}}'
+        {{{#_ingest.on_failure_processor_tag}}}with tag '{{{ _ingest.on_failure_processor_tag }}}'
+        {{{/_ingest.on_failure_processor_tag}}}failed with message '{{{ _ingest.on_failure_message }}}'
+  - set:
+      field: event.kind
+      tag: set_pipeline_error_to_event_kind
+      value: pipeline_error
+  - append:
+      field: tags
+      value: preserve_original_event
+      allow_duplicates: false

@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Weekly, so system tests still catch upstream stack drift on a quiet repo.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      system_tests:
+        description: Also run system tests (boots a full stack, slow)
+        type: boolean
+        default: false
+
+env:
+  ELASTIC_PACKAGE_VERSION: v0.125.1
+
+defaults:
+  run:
+    working-directory: packages/truenas
+
+jobs:
+  check:
+    name: Lint and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elastic-package
+        uses: ./.github/actions/setup-elastic-package
+
+      - name: Check package
+        run: elastic-package check -v
+
+      - name: Upload built package
+        uses: actions/upload-artifact@v4
+        with:
+          name: truenas-package
+          path: build/packages/*.zip
+          if-no-files-found: error
+
+  pipeline-tests:
+    name: Pipeline tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elastic-package
+        uses: ./.github/actions/setup-elastic-package
+
+      # Pipeline tests exercise ingest pipelines through the ES simulate API and
+      # never touch Kibana or Fleet, so an Elasticsearch-only stack is enough.
+      - name: Boot Elasticsearch
+        run: elastic-package stack up -d -v --services elasticsearch
+
+      - name: Run pipeline tests
+        run: elastic-package test pipeline -v --report-format xUnit --report-output file
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-test-reports
+          path: ~/.elastic-package/tmp/test-results/*.xml
+          if-no-files-found: ignore
+
+      - name: Tear down the stack
+        if: always()
+        run: elastic-package stack down -v
+
+  system-tests:
+    name: System tests
+    # Boots the full stack (Elasticsearch, Kibana, Fleet Server, agent) and the
+    # docker-compose mocks. Slow and resource-hungry, so it runs weekly and on
+    # request rather than on every push.
+    if: github.event_name == 'schedule' || inputs.system_tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elastic-package
+        uses: ./.github/actions/setup-elastic-package
+
+      - name: Boot up the stack
+        run: elastic-package stack up -d -v
+
+      - name: Run system tests
+        run: elastic-package test system -v --report-format xUnit --report-output file
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-test-reports
+          path: ~/.elastic-package/tmp/test-results/*.xml
+          if-no-files-found: ignore
+
+      - name: Tear down the stack
+        if: always()
+        run: elastic-package stack down -v

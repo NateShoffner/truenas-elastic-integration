@@ -1,0 +1,1314 @@
+{
+    "attributes": {
+        "description": "Overview of the TrueNAS audit records collected by the TrueNAS integration: middleware API calls and authentications, SMB sessions and file operations, sudo command execution, and system login events. Every panel is scoped to the truenas.audit dataset.",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": "data_stream.dataset: \"truenas.audit\""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "syncCursor": true,
+            "syncTooltips": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-62ba2161-fa28-5717-8ae5-56e16b2fbcb8",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "62ba2161-fa28-5717-8ae5-56e16b2fbcb8": {
+                                            "columnOrder": [
+                                                "f1d314ad-8517-58a6-8c57-c72c1adf6e40"
+                                            ],
+                                            "columns": {
+                                                "f1d314ad-8517-58a6-8c57-c72c1adf6e40": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.audit\""
+                            },
+                            "visualization": {
+                                "layerId": "62ba2161-fa28-5717-8ae5-56e16b2fbcb8",
+                                "layerType": "data",
+                                "metricAccessor": "f1d314ad-8517-58a6-8c57-c72c1adf6e40"
+                            }
+                        },
+                        "title": "Audit records",
+                        "type": "lens",
+                        "visualizationType": "lnsMetric"
+                    },
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "69adbd8a-5a48-5bf3-9cbd-8de461ff69bc",
+                    "w": 16,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "69adbd8a-5a48-5bf3-9cbd-8de461ff69bc",
+                "title": "Audit records",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-63717ac3-f0b5-5435-a1f7-e34ce6c1ba12",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "63717ac3-f0b5-5435-a1f7-e34ce6c1ba12": {
+                                            "columnOrder": [
+                                                "b1dea361-4c18-5409-a28d-33ce49dcde92"
+                                            ],
+                                            "columns": {
+                                                "b1dea361-4c18-5409-a28d-33ce49dcde92": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.audit\" and event.outcome: \"failure\""
+                            },
+                            "visualization": {
+                                "layerId": "63717ac3-f0b5-5435-a1f7-e34ce6c1ba12",
+                                "layerType": "data",
+                                "metricAccessor": "b1dea361-4c18-5409-a28d-33ce49dcde92"
+                            }
+                        },
+                        "title": "Failed events",
+                        "type": "lens",
+                        "visualizationType": "lnsMetric"
+                    },
+                    "description": "Audit records with event.outcome: failure, for example a rejected sudo command or a failed SMB or middleware authentication.",
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "c07bdd88-e85e-52c1-855c-d86c66a07f1f",
+                    "w": 16,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "c07bdd88-e85e-52c1-855c-d86c66a07f1f",
+                "title": "Failed events",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-e62a6e0d-1be0-5654-a15b-fc7c81b0ad4f",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "e62a6e0d-1be0-5654-a15b-fc7c81b0ad4f": {
+                                            "columnOrder": [
+                                                "14c05e14-fb24-556c-9083-c4f900de4557"
+                                            ],
+                                            "columns": {
+                                                "14c05e14-fb24-556c-9083-c4f900de4557": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "",
+                                                    "operationType": "unique_count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "user.name"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.audit\""
+                            },
+                            "visualization": {
+                                "layerId": "e62a6e0d-1be0-5654-a15b-fc7c81b0ad4f",
+                                "layerType": "data",
+                                "metricAccessor": "14c05e14-fb24-556c-9083-c4f900de4557"
+                            }
+                        },
+                        "title": "Users seen",
+                        "type": "lens",
+                        "visualizationType": "lnsMetric"
+                    },
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "c5375b7e-a134-5900-b2c5-7007d9244a2d",
+                    "w": 16,
+                    "x": 32,
+                    "y": 0
+                },
+                "panelIndex": "c5375b7e-a134-5900-b2c5-7007d9244a2d",
+                "title": "Users seen",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-f8866bdd-df0e-5dab-987c-824f614029e6",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "f8866bdd-df0e-5dab-987c-824f614029e6": {
+                                            "columnOrder": [
+                                                "153be212-3c70-5c04-ab97-72a90aa3ea86",
+                                                "914424e9-b02e-58c1-99f6-5ff316ecd9af",
+                                                "de48ca0e-480b-513e-96c8-34df6c4c0b23"
+                                            ],
+                                            "columns": {
+                                                "153be212-3c70-5c04-ab97-72a90aa3ea86": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "914424e9-b02e-58c1-99f6-5ff316ecd9af": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Service",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "fallback": true,
+                                                            "type": "alphabetical"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.provider"
+                                                },
+                                                "de48ca0e-480b-513e-96c8-34df6c4c0b23": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Audit records",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.audit\""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": false,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "de48ca0e-480b-513e-96c8-34df6c4c0b23"
+                                        ],
+                                        "layerId": "f8866bdd-df0e-5dab-987c-824f614029e6",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar_stacked",
+                                        "showGridlines": false,
+                                        "splitAccessor": "914424e9-b02e-58c1-99f6-5ff316ecd9af",
+                                        "xAccessor": "153be212-3c70-5c04-ab97-72a90aa3ea86"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide"
+                            }
+                        },
+                        "title": "Audit records over time by service",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "description": "Broken down by event.provider: MIDDLEWARE, SMB, SUDO and SYSTEM.",
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "76a1b577-dd33-5fd7-8e65-576c8c1914e9",
+                    "w": 48,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "76a1b577-dd33-5fd7-8e65-576c8c1914e9",
+                "title": "Audit records over time by service",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-39a37087-ef1d-5dcd-9b90-5bf4ee55e24b",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "39a37087-ef1d-5dcd-9b90-5bf4ee55e24b": {
+                                            "columnOrder": [
+                                                "78e8d827-7aa2-570c-8cd4-4d374ec2f626",
+                                                "b66f7837-5c9a-5af9-9e83-cbe9c271e757"
+                                            ],
+                                            "columns": {
+                                                "78e8d827-7aa2-570c-8cd4-4d374ec2f626": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Action",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "b66f7837-5c9a-5af9-9e83-cbe9c271e757",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.action"
+                                                },
+                                                "b66f7837-5c9a-5af9-9e83-cbe9c271e757": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Audit records",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.audit\""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": false,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "b66f7837-5c9a-5af9-9e83-cbe9c271e757"
+                                        ],
+                                        "layerId": "39a37087-ef1d-5dcd-9b90-5bf4ee55e24b",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar_horizontal",
+                                        "showGridlines": false,
+                                        "xAccessor": "78e8d827-7aa2-570c-8cd4-4d374ec2f626"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_horizontal",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide"
+                            }
+                        },
+                        "title": "Top actions",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "description": "event.action is composed as <service>-<event>, for example smb-create or middleware-method-call.",
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "e835fde4-f957-54ac-b8d1-4b0d8015db09",
+                    "w": 24,
+                    "x": 0,
+                    "y": 21
+                },
+                "panelIndex": "e835fde4-f957-54ac-b8d1-4b0d8015db09",
+                "title": "Top actions",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-62296731-6cbc-52f4-ae2b-5d565e68a6b9",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "62296731-6cbc-52f4-ae2b-5d565e68a6b9": {
+                                            "columnOrder": [
+                                                "e0bfbceb-9200-55ef-a0b1-e925a28ea3cb",
+                                                "2bb2669f-514b-5223-8e27-04b5e06407e8",
+                                                "ef1c35e9-661e-5e57-aef8-1556e16c6fb0"
+                                            ],
+                                            "columns": {
+                                                "2bb2669f-514b-5223-8e27-04b5e06407e8": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "User",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "ef1c35e9-661e-5e57-aef8-1556e16c6fb0",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 5
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "user.name"
+                                                },
+                                                "e0bfbceb-9200-55ef-a0b1-e925a28ea3cb": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Action",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "ef1c35e9-661e-5e57-aef8-1556e16c6fb0",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.action"
+                                                },
+                                                "ef1c35e9-661e-5e57-aef8-1556e16c6fb0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Failed events",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.audit\" and event.outcome: \"failure\""
+                            },
+                            "visualization": {
+                                "columns": [
+                                    {
+                                        "columnId": "e0bfbceb-9200-55ef-a0b1-e925a28ea3cb",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "2bb2669f-514b-5223-8e27-04b5e06407e8",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "ef1c35e9-661e-5e57-aef8-1556e16c6fb0",
+                                        "isTransposed": false
+                                    }
+                                ],
+                                "layerId": "62296731-6cbc-52f4-ae2b-5d565e68a6b9",
+                                "layerType": "data"
+                            }
+                        },
+                        "title": "Failures by action and user",
+                        "type": "lens",
+                        "visualizationType": "lnsDatatable"
+                    },
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "6ec2f492-d00b-5f29-9fc1-77dcd3e8ad22",
+                    "w": 24,
+                    "x": 24,
+                    "y": 21
+                },
+                "panelIndex": "6ec2f492-d00b-5f29-9fc1-77dcd3e8ad22",
+                "title": "Failures by action and user",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-aef98323-bed5-5ff1-a7ac-524c1ab1dec8",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "aef98323-bed5-5ff1-a7ac-524c1ab1dec8": {
+                                            "columnOrder": [
+                                                "a5da4415-1ee1-5e48-aaf5-fb1f093d0733",
+                                                "ff5268d6-270d-57fd-8107-6915b7acb9ab"
+                                            ],
+                                            "columns": {
+                                                "a5da4415-1ee1-5e48-aaf5-fb1f093d0733": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "User",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "ff5268d6-270d-57fd-8107-6915b7acb9ab",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "user.name"
+                                                },
+                                                "ff5268d6-270d-57fd-8107-6915b7acb9ab": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Audit records",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.audit\""
+                            },
+                            "visualization": {
+                                "columns": [
+                                    {
+                                        "columnId": "a5da4415-1ee1-5e48-aaf5-fb1f093d0733",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "ff5268d6-270d-57fd-8107-6915b7acb9ab",
+                                        "isTransposed": false
+                                    }
+                                ],
+                                "layerId": "aef98323-bed5-5ff1-a7ac-524c1ab1dec8",
+                                "layerType": "data"
+                            }
+                        },
+                        "title": "Top users",
+                        "type": "lens",
+                        "visualizationType": "lnsDatatable"
+                    },
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "0e06bd33-a86f-5bfd-8c41-db06b05c67dd",
+                    "w": 16,
+                    "x": 0,
+                    "y": 35
+                },
+                "panelIndex": "0e06bd33-a86f-5bfd-8c41-db06b05c67dd",
+                "title": "Top users",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-2ee573e2-8d82-5194-91b0-273e81e6f9dc",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "2ee573e2-8d82-5194-91b0-273e81e6f9dc": {
+                                            "columnOrder": [
+                                                "e75a077b-5738-5d28-838f-82bd1227fbca",
+                                                "6f40cfae-278c-5ca6-9d3e-5db9711c2357"
+                                            ],
+                                            "columns": {
+                                                "6f40cfae-278c-5ca6-9d3e-5db9711c2357": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Audit records",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                },
+                                                "e75a077b-5738-5d28-838f-82bd1227fbca": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Source IP",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "6f40cfae-278c-5ca6-9d3e-5db9711c2357",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "source.ip"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.audit\""
+                            },
+                            "visualization": {
+                                "columns": [
+                                    {
+                                        "columnId": "e75a077b-5738-5d28-838f-82bd1227fbca",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "6f40cfae-278c-5ca6-9d3e-5db9711c2357",
+                                        "isTransposed": false
+                                    }
+                                ],
+                                "layerId": "2ee573e2-8d82-5194-91b0-273e81e6f9dc",
+                                "layerType": "data"
+                            }
+                        },
+                        "title": "Top source IPs",
+                        "type": "lens",
+                        "visualizationType": "lnsDatatable"
+                    },
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "1681f1b3-c1b0-5bd5-b3e6-cac2748f259c",
+                    "w": 16,
+                    "x": 16,
+                    "y": 35
+                },
+                "panelIndex": "1681f1b3-c1b0-5bd5-b3e6-cac2748f259c",
+                "title": "Top source IPs",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-c57e6f22-3092-5a9a-8159-0215d817c186",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "c57e6f22-3092-5a9a-8159-0215d817c186": {
+                                            "columnOrder": [
+                                                "3e028ece-0dbc-52f3-9d4a-aa5c4c39dbf0",
+                                                "c2857ef8-3828-5aa0-a20b-be53df6c7913"
+                                            ],
+                                            "columns": {
+                                                "3e028ece-0dbc-52f3-9d4a-aa5c4c39dbf0": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Share",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "c2857ef8-3828-5aa0-a20b-be53df6c7913",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "truenas.audit.share"
+                                                },
+                                                "c2857ef8-3828-5aa0-a20b-be53df6c7913": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Audit records",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.audit\""
+                            },
+                            "visualization": {
+                                "columns": [
+                                    {
+                                        "columnId": "3e028ece-0dbc-52f3-9d4a-aa5c4c39dbf0",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "c2857ef8-3828-5aa0-a20b-be53df6c7913",
+                                        "isTransposed": false
+                                    }
+                                ],
+                                "layerId": "c57e6f22-3092-5a9a-8159-0215d817c186",
+                                "layerType": "data"
+                            }
+                        },
+                        "title": "Top SMB shares",
+                        "type": "lens",
+                        "visualizationType": "lnsDatatable"
+                    },
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "ebee6e99-1966-512a-abf5-73a5443a26db",
+                    "w": 16,
+                    "x": 32,
+                    "y": 35
+                },
+                "panelIndex": "ebee6e99-1966-512a-abf5-73a5443a26db",
+                "title": "Top SMB shares",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-8400e57c-1eb7-549f-acdf-6e34a51da5e9",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "8400e57c-1eb7-549f-acdf-6e34a51da5e9": {
+                                            "columnOrder": [
+                                                "eb2d9732-f022-565f-928b-c4da914112e7",
+                                                "a095e822-cb52-5298-aefd-e7d80342e005"
+                                            ],
+                                            "columns": {
+                                                "a095e822-cb52-5298-aefd-e7d80342e005": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Operations",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                },
+                                                "eb2d9732-f022-565f-928b-c4da914112e7": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "File",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "a095e822-cb52-5298-aefd-e7d80342e005",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "file.path"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.audit\""
+                            },
+                            "visualization": {
+                                "columns": [
+                                    {
+                                        "columnId": "eb2d9732-f022-565f-928b-c4da914112e7",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "a095e822-cb52-5298-aefd-e7d80342e005",
+                                        "isTransposed": false
+                                    }
+                                ],
+                                "layerId": "8400e57c-1eb7-549f-acdf-6e34a51da5e9",
+                                "layerType": "data"
+                            }
+                        },
+                        "title": "Top files touched over SMB",
+                        "type": "lens",
+                        "visualizationType": "lnsDatatable"
+                    },
+                    "description": "file.path is only recorded for the SMB operations that name a file, such as create, rename, unlink and set-acl.",
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "87e1fa17-30fb-5278-ab6e-150d0727651d",
+                    "w": 24,
+                    "x": 0,
+                    "y": 48
+                },
+                "panelIndex": "87e1fa17-30fb-5278-ab6e-150d0727651d",
+                "title": "Top files touched over SMB",
+                "type": "lens"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "logs-*",
+                                "name": "indexpattern-datasource-layer-3d93c164-2152-5e52-a093-12c17abcf3a9",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "3d93c164-2152-5e52-a093-12c17abcf3a9": {
+                                            "columnOrder": [
+                                                "d71ede07-a2e6-5d80-badd-b02a2a6a0dad",
+                                                "549336bd-8548-5160-b115-687186d5809c",
+                                                "ee701912-0f88-56b5-824d-29cf6c2f73dd",
+                                                "c67927d7-ffb0-5fd0-b415-33cc9ea9816d"
+                                            ],
+                                            "columns": {
+                                                "549336bd-8548-5160-b115-687186d5809c": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Command",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "c67927d7-ffb0-5fd0-b415-33cc9ea9816d",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "process.command_line"
+                                                },
+                                                "c67927d7-ffb0-5fd0-b415-33cc9ea9816d": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Runs",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                },
+                                                "d71ede07-a2e6-5d80-badd-b02a2a6a0dad": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "User",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "c67927d7-ffb0-5fd0-b415-33cc9ea9816d",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "user.name"
+                                                },
+                                                "ee701912-0f88-56b5-824d-29cf6c2f73dd": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Outcome",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "c67927d7-ffb0-5fd0-b415-33cc9ea9816d",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 3
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.outcome"
+                                                }
+                                            },
+                                            "ignoreGlobalFilters": false,
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "data_stream.dataset: \"truenas.audit\" and event.provider: \"SUDO\""
+                            },
+                            "visualization": {
+                                "columns": [
+                                    {
+                                        "columnId": "d71ede07-a2e6-5d80-badd-b02a2a6a0dad",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "549336bd-8548-5160-b115-687186d5809c",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "ee701912-0f88-56b5-824d-29cf6c2f73dd",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "c67927d7-ffb0-5fd0-b415-33cc9ea9816d",
+                                        "isTransposed": false
+                                    }
+                                ],
+                                "layerId": "3d93c164-2152-5e52-a093-12c17abcf3a9",
+                                "layerType": "data"
+                            }
+                        },
+                        "title": "Sudo commands",
+                        "type": "lens",
+                        "visualizationType": "lnsDatatable"
+                    },
+                    "description": "Outcome success corresponds to sudo-accept and failure to sudo-reject.",
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "5bcbb3fd-d630-52cf-9920-a0b9a3a47883",
+                    "w": 24,
+                    "x": 24,
+                    "y": 48
+                },
+                "panelIndex": "5bcbb3fd-d630-52cf-9920-a0b9a3a47883",
+                "title": "Sudo commands",
+                "type": "lens"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Logs TrueNAS] Audit overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.8.0",
+    "id": "truenas-audit-overview",
+    "references": [
+        {
+            "id": "logs-*",
+            "name": "69adbd8a-5a48-5bf3-9cbd-8de461ff69bc:indexpattern-datasource-layer-62ba2161-fa28-5717-8ae5-56e16b2fbcb8",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "c07bdd88-e85e-52c1-855c-d86c66a07f1f:indexpattern-datasource-layer-63717ac3-f0b5-5435-a1f7-e34ce6c1ba12",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "c5375b7e-a134-5900-b2c5-7007d9244a2d:indexpattern-datasource-layer-e62a6e0d-1be0-5654-a15b-fc7c81b0ad4f",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "76a1b577-dd33-5fd7-8e65-576c8c1914e9:indexpattern-datasource-layer-f8866bdd-df0e-5dab-987c-824f614029e6",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "e835fde4-f957-54ac-b8d1-4b0d8015db09:indexpattern-datasource-layer-39a37087-ef1d-5dcd-9b90-5bf4ee55e24b",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "6ec2f492-d00b-5f29-9fc1-77dcd3e8ad22:indexpattern-datasource-layer-62296731-6cbc-52f4-ae2b-5d565e68a6b9",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "0e06bd33-a86f-5bfd-8c41-db06b05c67dd:indexpattern-datasource-layer-aef98323-bed5-5ff1-a7ac-524c1ab1dec8",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "1681f1b3-c1b0-5bd5-b3e6-cac2748f259c:indexpattern-datasource-layer-2ee573e2-8d82-5194-91b0-273e81e6f9dc",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "ebee6e99-1966-512a-abf5-73a5443a26db:indexpattern-datasource-layer-c57e6f22-3092-5a9a-8159-0215d817c186",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "87e1fa17-30fb-5278-ab6e-150d0727651d:indexpattern-datasource-layer-8400e57c-1eb7-549f-acdf-6e34a51da5e9",
+            "type": "index-pattern"
+        },
+        {
+            "id": "logs-*",
+            "name": "5bcbb3fd-d630-52cf-9920-a0b9a3a47883:indexpattern-datasource-layer-3d93c164-2152-5e52-a093-12c17abcf3a9",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "dashboard",
+    "typeMigrationVersion": "10.3.0"
+}
