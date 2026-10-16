@@ -54,9 +54,12 @@ Bump `version` in `packages/truenas/manifest.yml`, add a matching
 git tag v0.2.0 && git push origin v0.2.0
 ```
 
-CI verifies the tag matches the manifest version, builds the package, and
-publishes a GitHub release with the `.zip` attached and notes drawn from the
-changelog entry.
+CI verifies the tag matches the manifest version, runs the tests, builds the
+package, and publishes a GitHub release with the `.zip` attached, a build
+provenance attestation, and notes drawn from the changelog entry.
+
+Both CI and the release run on the shared reusable workflows in
+[`NateShoffner/elastic-package-workflows`](https://github.com/NateShoffner/elastic-package-workflows).
 
 ## License
 
