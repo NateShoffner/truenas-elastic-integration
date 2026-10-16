@@ -25,7 +25,4 @@ jobs:
     uses: NateShoffner/elastic-package-workflows/.github/workflows/ci.yml@main
     with:
       package: packages/truenas
-      # TEMPORARY: forced on so this pull request exercises the full-stack
-      # tests. Before merging, drop this line and restore the one below.
-      stack-tests: true
-      # stack-tests: ${{ github.event_name == 'schedule' || inputs.stack-tests == true }}
+      stack-tests: ${{ github.event_name == 'schedule' || inputs.stack-tests == true }}

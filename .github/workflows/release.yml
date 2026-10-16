@@ -3,9 +3,6 @@ name: Release
 on:
   push:
     tags: ['v*']
-  # TEMPORARY: lets the dry-run job below validate this workflow on the pull
-  # request that migrates it. Remove along with that job.
-  pull_request:
 
 # A called workflow cannot request more than its caller grants.
 permissions:
@@ -15,23 +12,8 @@ permissions:
 
 jobs:
   release:
-    # TEMPORARY: guard needed only while the pull_request trigger above exists,
-    # so a pull request does not try to publish a release for a branch ref.
-    if: github.event_name == 'push'
     # Pinned to @main because elastic-package-workflows has no tag yet; move
     # this to @v1 once it cuts one.
     uses: NateShoffner/elastic-package-workflows/.github/workflows/release.yml@main
     with:
       package: packages/truenas
-
-  # TEMPORARY: the whole job. Runs every release check against the version in
-  # manifest.yml and publishes nothing, so the migration is validated before
-  # merge. Remove it together with the pull_request trigger above.
-  release-dry-run:
-    name: Release dry run (TEMPORARY)
-    if: github.event_name == 'pull_request'
-    uses: NateShoffner/elastic-package-workflows/.github/workflows/release.yml@main
-    with:
-      package: packages/truenas
-      tag: v0.1.0
-      dry-run: true
